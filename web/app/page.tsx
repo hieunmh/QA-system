@@ -15,7 +15,7 @@ export default function Home() {
           </p>
         </div>
 
-        <Image src='/home.png' alt="home" width={1000} height={1000} className="w-[300px]" />
+        <Image src='/home.png' alt="home" width={1000} height={1000} className="w-[400px]" />
       </div>
     </div>
   );
