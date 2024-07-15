@@ -8,6 +8,8 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 import { FaLock, FaUser } from 'react-icons/fa';
 import { LuLoader } from 'react-icons/lu';
+import axios from '@/lib/axios';
+import { SIGNIN_URL } from '@/lib/apiEndPoints';
 
 type Inputs = {
   email: string;
@@ -51,6 +53,8 @@ export default function SignIn() {
     }
 
     setLoading(true);
+
+    await axios.post(SIGNIN_URL, formData);
   }
 
 

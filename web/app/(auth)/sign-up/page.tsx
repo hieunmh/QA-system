@@ -1,7 +1,10 @@
 'use client';
 
+import { SIGNUP_URL } from '@/lib/apiEndPoints';
+import axios from '@/lib/axios';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { FaLock, FaUser } from 'react-icons/fa';
@@ -23,6 +26,8 @@ export default function SignUp() {
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const router = useRouter();
 
   const toggleShowPass = () => {
     if (showPass) setShowPass(false);
@@ -59,7 +64,12 @@ export default function SignUp() {
     }
 
     setLoading(true);
+    
+    await axios.post(SIGNUP_URL, formData);
 
+    setLoading(false);
+
+    router.push('/');
   }
 
   return (
@@ -77,7 +87,7 @@ export default function SignUp() {
           <div className='relative text-[#4a3aff]'>
             <p className='font-semibold text-black'>ユーサー名</p>
             <FaUser size={20} className='absolute top-[37.5px] left-3' />
-            <input type="email" placeholder='桐生戦兎' {...register('email')}
+            <input type="email" placeholder='桐生戦兎' {...register('username')}
               className={`py-3 px-10 w-full text-black border-[1.5px] rounded focus:outline-none 
                 ${userError ? 'border-rose-500' : 'focus:border-[#4a3aff]'}`}
             />

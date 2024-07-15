@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('histories', function (Blueprint $table) {
-            $table->uuid();
+            $table->uuid('id');
             $table->uuid('user_id');
             $table->uuid('exam_id');
             $table->uuid('question_id');
