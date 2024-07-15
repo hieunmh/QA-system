@@ -7,7 +7,7 @@ export default function Header() {
     <div className='w-full h-20 bg-white md:px-32 px-2 flex items-center justify-between'>
       <div className='flex items-center space-x-2'>
         <Image src='/logo.png' width={1000} height={1000} className='w-[30px]' alt='logo' />
-        <p className='font-semibold text-3xl text-[#4a3aff]'>prg</p>
+        <Link href={'/'} className='font-semibold text-3xl text-[#4a3aff]'>prg</Link>
       </div>
 
       <div className='flex items-center space-x-3'>
