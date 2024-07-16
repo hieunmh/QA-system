@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\SignInRequest;
+use App\Http\Requests\SignUpRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,8 +15,13 @@ class AuthController extends Controller
         return Auth::user();
     }
 
-    public function signin(Request $request) {
-        Auth::attempt($request->only(['email', 'password']));
+    public function signin(SignInRequest $request) {
+        if (!Auth::attempt($request->only(['email', 'password']))) {
+            return response()->json([
+                'status' => 401,
+                'msg' => 'Invalid credentials!'
+            ], 401);
+        }
         
         $user = User::where('email', $request->email)->first();
 
@@ -23,20 +30,32 @@ class AuthController extends Controller
         $cookie = cookie('jwt', $token);
 
         return response([
-            'msg' => 'sign in successfully.',
+            'msg' => 'Sign in successfully!',
             'token' => $token
         ])->withCookie($cookie);
     }
 
-    public function signup(Request $request) {
+    public function signup(SignUpRequest $request) {
         
-        $user = User::create($request->all());
+        try {
+            $user = User::create($request->all());
 
-        return response()->json([
-            'status' => 200,
-            'msg' => 'create user successfully.',
-            'user' => $user
-        ]);
+            $token = $user->createToken('token')->plainTextToken;
+
+            return response()->json([
+                'status' => 200,
+                'msg' => 'Create user successfully!',
+                'user' => $user,
+                'token' =>$token
+            ]);
+
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'status' => 500,
+                'msg' => 'Something went wrong!'
+            ], 500);        
+        }
     }
 
     public function signout() {
