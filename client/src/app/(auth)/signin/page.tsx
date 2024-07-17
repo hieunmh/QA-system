@@ -87,7 +87,7 @@ export default function SignIn() {
 
         <div className='text-xs font-semibold text-rose-500 mt-3 h-5'>{serverError}</div>
 
-        <div className='h-[1px] w-full bg-gray-300 mt-5 mb-10' />
+        <div className='h-[1px] w-full bg-gray-300 mt-3 mb-10' />
 
         <div className='flex items-center justify-center space-x-1 border rounded-md py-3 w-full cursor-pointer hover:bg-gray-50'>
           <Image src={'/google.png'} alt='google' width={1000} height={1000} className='w-[20px]' />
