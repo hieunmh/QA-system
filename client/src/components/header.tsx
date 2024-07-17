@@ -42,10 +42,8 @@ export default function Header() {
 
     localStorage.removeItem('token');
 
-    setUser(null);
-  
     router.push('/signin');
-
+    setUser(null);
   }
 
   return (
