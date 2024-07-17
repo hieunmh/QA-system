@@ -25,12 +25,13 @@ class AuthController extends Controller
         
         $user = User::where('email', $request->email)->first();
 
-        $token = $user->createToken('token')->plainTextToken;
+        $token = $user->createToken('prg')->plainTextToken;
 
         $cookie = cookie('jwt', $token);
 
         return response([
             'msg' => 'Sign in successfully!',
+            'user' => $user,
             'token' => $token
         ])->withCookie($cookie);
     }
@@ -53,16 +54,18 @@ class AuthController extends Controller
 
             return response()->json([
                 'status' => 500,
-                'msg' => 'Something went wrong!'
+                'msg' => $e->getMessage()
             ], 500);        
         }
     }
 
-    public function signout() {
+    public function signout(Request $request) {
         $cookie = Cookie::forget('jwt');
 
-        return response([
-            'message' => 'Success'
+        $request->user()->tokens()->delete();
+
+        return response()->json([
+            'msg' => 'Sign out successfully!'
         ])->withCookie($cookie);
     }
 }

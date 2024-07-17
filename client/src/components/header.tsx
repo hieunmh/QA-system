@@ -1,9 +1,52 @@
-import Image from 'next/image'
-import Link from 'next/link'
-import React from 'react'
+'use client';
+
+import axiosClient from '@/lib/axios';
+import Image from 'next/image';
+import Link from 'next/link';
+import React, { useEffect } from 'react';
+import { useUser } from '@/hooks/useUser';
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+import { Button } from './ui/button';
+import { useRouter } from 'next/navigation';
+
 
 export default function Header() {
 
+  const { user, setUser } = useUser();
+  const router = useRouter();
+
+  useEffect(() => {
+    let token = localStorage.getItem('token');
+
+    if (!token) {
+      return;
+    }
+
+    const getUser = async () => {
+      const res = await axiosClient.get('/user', { headers: { 'Authorization': token } });
+      setUser(res.data);
+    }
+
+    getUser();
+  }, []); 
+
+  const signout = async () => {
+    await axiosClient.post('/signout', {}, { headers: { 'Authorization': localStorage.getItem('token') } });
+
+    localStorage.removeItem('token');
+
+    setUser(null);
+  
+    router.push('/signin');
+
+  }
 
   return (
     <div className='w-full fixed top-0 h-20 bg-white px-2 lg:px-20 flex justify-between items-center'>
@@ -12,15 +55,30 @@ export default function Header() {
         <p className='text-[#4a3aff] font-bold text-3xl'>prg</p>
       </Link>
 
-      <div className='flex space-x-3 font-semibold text-sm md:text-base'>
+      {user ? (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant={'outline'}>{user.name}</Button>
+          </DropdownMenuTrigger>
+
+          <DropdownMenuContent>
+            <DropdownMenuItem>Profile</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => signout()}>Sign out</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ) : (
+        <div className='flex space-x-3 font-semibold text-sm md:text-base'>
         <Link href={'/signin'} className='border rounded-xl py-3 px-5 hover:bg-gray-50'>
           ログイン
         </Link>
 
-        <Link href={'/signin'} className='border rounded-xl py-3 px-5 bg-[#4a3aff] hover:bg-[#4a3aff]/95 text-white'>
+        <Link href={'/signup'} className='border rounded-xl py-3 px-5 bg-[#4a3aff] hover:bg-[#4a3aff]/95 text-white'>
           始めましょう
         </Link>
       </div>
+      )}
+
+
     </div>
   )
 }

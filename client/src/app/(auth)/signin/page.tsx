@@ -1,9 +1,13 @@
 'use client';
+import { useUser } from '@/hooks/useUser';
+import axiosClient from '@/lib/axios';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { useForm, SubmitHandler } from "react-hook-form";
 import { IoEye, IoEyeOff } from "react-icons/io5";
+import { LuLoader2 } from 'react-icons/lu';
 
 type SignInForm = {
   email: string;
@@ -12,12 +16,17 @@ type SignInForm = {
 
 export default function SignIn() {
 
+  const [loading, setLoading] = useState(false);
   const [showPass, setShowPass] = useState(false);
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [serverError, setServerError] = useState('');
 
   const { register, handleSubmit } = useForm<SignInForm>();
+
+  const { user, setUser } = useUser();
+
+  const router = useRouter();
 
   const togglePassword = () => {
     if (showPass) setShowPass(false);
@@ -45,6 +54,20 @@ export default function SignIn() {
     } else {
       setPasswordError('');
     }
+
+    setLoading(true);
+
+    await axiosClient.post('/signin', form).then(res => {
+      if (res.status === 200) {
+        localStorage.setItem('token', `Bearer ${res.data?.token}`);
+        setUser(res.data?.user);
+        router.push('/');
+      }
+    }).catch(error => {
+      setServerError('メールアドレスまたはパスワードが間違っています。')
+    }).finally(() => {
+      setLoading(false);
+    });
     
   } 
 
@@ -80,8 +103,14 @@ export default function SignIn() {
             <p className='text-xs font-semibold text-rose-500 h-5'>{passwordError}</p>
           </div>
 
-          <button className='rounded-md bg-[#4a3aff] hover:bg-[#4a3aff]/95 w-full py-3 font-semibold text-white mt-5'>
-            ログイン
+          <button className='rounded-md bg-[#4a3aff] hover:bg-[#4a3aff]/95 w-full py-3 font-semibold text-white mt-5 flex items-center justify-center'>
+            {loading ? (
+                <LuLoader2 size={24} className=' animate-spin' />
+              ) : (
+                <p>
+                  登録
+                </p>
+              )}
           </button>
         </form>
 

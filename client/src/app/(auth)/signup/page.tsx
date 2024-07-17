@@ -1,24 +1,33 @@
 'use client';
+
+import { useUser } from '@/hooks/useUser';
 import axiosClient from '@/lib/axios';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { useForm, SubmitHandler } from "react-hook-form";
 import { IoEye, IoEyeOff } from "react-icons/io5";
+import { LuLoader2 } from "react-icons/lu";
 
 type SignUpForm = {
-  username: string;
+  name: string;
   email: string;
   password: string;
 }
 
 export default function SignUp() {
 
+  const router = useRouter();
+
+  const [loading, setLoading] = useState(false);
   const [showPass, setShowPass] = useState(false);
   const [nameError, setNameError] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [serverError, setServerError] = useState('');
+
+  const { user, setUser } = useUser();
 
   const { register, handleSubmit } = useForm<SignUpForm>();
 
@@ -29,7 +38,7 @@ export default function SignUp() {
 
   const signin: SubmitHandler<SignUpForm> = async (form) => {
 
-    if (form.username.length === 0) {
+    if (form.name.length === 0) {
       setNameError('ユーサー名を入力してください。');
       return;
     } else {
@@ -57,9 +66,24 @@ export default function SignUp() {
       setPasswordError('');
     }
 
-    await axiosClient.post('/signup', form).then((res) => {
-      console.log(res);
+    setLoading(true);
+
+    await axiosClient.post('/signup', form).then(res =>  {
+      if (res.status === 200) {
+        let token = res.data?.token;
+  
+        localStorage.setItem('token', `Bearer ${token}`);   
+        setUser(res.data?.user);
+        
+        router.push('/');
+      }
+    }).catch(error => {
+      setServerError('ユーザーが登録されました。')
+      
+    }).finally(() => {
+        setLoading(false);
     });
+
     
   } 
 
@@ -78,7 +102,7 @@ export default function SignUp() {
         <form className=' w-full mt-10' onSubmit={handleSubmit(signin)}>
           <div className='w-full space-y-1'>
             <p className='font-semibold'>ユーサー名</p>
-            <input type="text" placeholder='' {...register('username')}
+            <input type="text" placeholder='' {...register('name')} disabled={loading}
               className={`focus:outline-none border-[1.5px] rounded-md py-3 px-5 w-full ${nameError ? 'border-rose-500' : 'focus:border-[#4a3aff]'}`}
             />
             <p className='text-xs font-semibold text-rose-500 h-5'>{nameError}</p>
@@ -86,7 +110,7 @@ export default function SignUp() {
 
           <div className='w-full space-y-1'>
             <p className='font-semibold'>メールアドレス</p>
-            <input type="text" placeholder='example@co.prg.jp' {...register('email')}
+            <input type="text" placeholder='example@co.prg.jp' {...register('email')} disabled={loading}
               className={`focus:outline-none border-[1.5px] rounded-md py-3 px-5 w-full ${emailError ? 'border-rose-500' : 'focus:border-[#4a3aff]'}`}
             />
             <p className='text-xs font-semibold text-rose-500 h-5'>{emailError}</p>
@@ -94,7 +118,7 @@ export default function SignUp() {
 
           <div className='w-full space-y-1 relative'>
             <p className='font-semibold'>パスワード</p>
-            <input type={showPass ? 'text' : 'password'} placeholder=''  {...register('password')}
+            <input type={showPass ? 'text' : 'password'} placeholder=''  {...register('password')} disabled={loading}
               className={`focus:outline-none border-[1.5px] rounded-md py-3 px-5 w-full ${passwordError ? 'border-rose-500' : 'focus:border-[#4a3aff]'}`}
             />
             {showPass ? <IoEye onClick={() => togglePassword()} size={20} className='text-[#4a3aff] absolute top-10 right-4 cursor-pointer' /> 
@@ -103,8 +127,14 @@ export default function SignUp() {
             <p className='text-xs font-semibold text-rose-500 h-5'>{passwordError}</p>
           </div>
 
-          <button className='rounded-md bg-[#4a3aff] hover:bg-[#4a3aff]/95 w-full py-3 font-semibold text-white mt-5'>
-            登録
+          <button className='rounded-md bg-[#4a3aff] hover:bg-[#4a3aff]/95 w-full py-3 font-semibold text-white mt-5 flex items-center justify-center'>
+            {loading ? (
+              <LuLoader2 size={24} className=' animate-spin' />
+            ) : (
+              <p>
+                登録
+              </p>
+            )}
           </button>
         </form>
 
