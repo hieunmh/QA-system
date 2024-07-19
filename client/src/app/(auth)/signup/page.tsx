@@ -45,7 +45,6 @@ export default function SignUp() {
       setNameError('');
     }
 
-
     if (form.email.length === 0) {
       setEmailError('メールアドレスを入力してください。');
       return;
@@ -68,23 +67,25 @@ export default function SignUp() {
 
     setLoading(true);
 
-    await axiosClient.post('/signup', form).then(res =>  {
-      if (res.status === 200) {
-        let token = res.data?.token;
-  
-        localStorage.setItem('token', `Bearer ${token}`);   
-        setUser(res.data?.user);
-        
-        router.push('/');
-      }
-    }).catch(error => {
-      setServerError('ユーザーが登録されました。')
-      
-    }).finally(() => {
-        setLoading(false);
-    });
+    await axiosClient.get('/sanctum/csrf-cookie');
 
-    
+    await axiosClient.post('/register', {
+      'name': form.name,
+      'email': form.email,
+      'password': form.password
+    }).then(res => {
+      router.push('/');
+
+
+    }).catch(error => {
+      setServerError('ユーザーが登録されました。');   
+
+    }).finally(async () => {
+      setLoading(false);
+      await axiosClient.get('/api/user').then(res => {
+        console.log(res);
+      });
+    });    
   } 
 
   return (

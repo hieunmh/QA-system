@@ -1,18 +1,10 @@
 <?php
 
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-
-
-//auth controller
-Route::controller(AuthController::class)->group(function() {
-
-    Route::post('/signup', 'signup');
-
-    Route::post('/signin', 'signin');
-
-    Route::get('/user', 'user')->middleware('auth:sanctum');
-
-    Route::post('/signout', 'signout')->middleware('auth:sanctum');
+Route::middleware(['auth:sanctum'])->group(function() {
+    Route::get('/user', [UserController::class, 'getUser']);
 });
+
