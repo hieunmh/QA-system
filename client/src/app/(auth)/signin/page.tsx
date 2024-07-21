@@ -57,17 +57,20 @@ export default function SignIn() {
 
     setLoading(true);
 
-    await axiosClient.post('/signin', form).then(res => {
-      if (res.status === 200) {
-        localStorage.setItem('token', `Bearer ${res.data?.token}`);
-        setUser(res.data?.user);
-        router.push('/');
-      }
+    await axiosClient.get('/sanctum/csrf-cookie');
+
+    await axiosClient.post('/login', form).then(res => {
+      
     }).catch(error => {
       setServerError('メールアドレスまたはパスワードが間違っています。')
     }).finally(() => {
       setLoading(false);
     });
+
+    await axiosClient.get('/api/user').then(res => {
+      setUser(res.data);
+      router.push('/');
+    })
     
   } 
 

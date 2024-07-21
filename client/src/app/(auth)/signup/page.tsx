@@ -5,15 +5,25 @@ import axiosClient from '@/lib/axios';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm, SubmitHandler } from "react-hook-form";
 import { IoEye, IoEyeOff } from "react-icons/io5";
 import { LuLoader2 } from "react-icons/lu";
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
 
 type SignUpForm = {
   name: string;
   email: string;
   password: string;
+  role: string;
 }
 
 export default function SignUp() {
@@ -26,6 +36,7 @@ export default function SignUp() {
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [serverError, setServerError] = useState('');
+  const [role, setRole] = useState('teacher');
 
   const { user, setUser } = useUser();
 
@@ -65,27 +76,25 @@ export default function SignUp() {
       setPasswordError('');
     }
 
+    form.role = role;
+
     setLoading(true);
 
     await axiosClient.get('/sanctum/csrf-cookie');
 
-    await axiosClient.post('/register', {
-      'name': form.name,
-      'email': form.email,
-      'password': form.password
-    }).then(res => {
-      router.push('/');
-
+    await axiosClient.post('/register', form).then(res => {
 
     }).catch(error => {
-      setServerError('ユーザーが登録されました。');   
-
-    }).finally(async () => {
+      setServerError('ユーザーが登録されました。');
+    }).finally(() => {
       setLoading(false);
-      await axiosClient.get('/api/user').then(res => {
-        console.log(res);
-      });
-    });    
+    });
+
+    await axiosClient.get('/api/user').then(res => {
+      setUser(res.data);
+      router.push('/');
+    });
+
   } 
 
   return (
@@ -127,6 +136,16 @@ export default function SignUp() {
             }
             <p className='text-xs font-semibold text-rose-500 h-5'>{passwordError}</p>
           </div>
+
+          <Select onValueChange={(value) => setRole(value)}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Teacher" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="teacher">Teacher</SelectItem>
+              <SelectItem value="student">Student</SelectItem>
+            </SelectContent>
+          </Select>
 
           <button className='rounded-md bg-[#4a3aff] hover:bg-[#4a3aff]/95 w-full py-3 font-semibold text-white mt-5 flex items-center justify-center'>
             {loading ? (

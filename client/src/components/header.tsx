@@ -15,35 +15,37 @@ import {
 
 import { Button } from './ui/button';
 import { useRouter } from 'next/navigation';
+import { useCookies } from 'react-cookie';
 
 
 export default function Header() {
 
   const { user, setUser } = useUser();
   const router = useRouter();
+  const [cookies, setCookie, removeCookie] = useCookies(['XSRF-TOKEN']);
 
   useEffect(() => {
-    let token = localStorage.getItem('token');
-
-    if (!token) {
-      return;
-    }
-
     const getUser = async () => {
-      const res = await axiosClient.get('/user', { headers: { 'Authorization': token } });
-      setUser(res.data);
+      
+      if (cookies['XSRF-TOKEN']) {
+        await axiosClient.get('/sanctum/csrf-cookie');
+        await axiosClient.get('/api/user').then(res => {
+          setUser(res.data);
+          
+        }).catch(error => {
+          Promise.reject(error)
+        });
+      }
     }
-
+    
     getUser();
   }, []); 
 
   const signout = async () => {
-    await axiosClient.post('/signout', {}, { headers: { 'Authorization': localStorage.getItem('token') } });
-
-    localStorage.removeItem('token');
-
-    router.push('/signin');
+    await axiosClient.post('/logout');
     setUser(null);
+    router.push('/signin');
+    removeCookie('XSRF-TOKEN');
   }
 
   return (
