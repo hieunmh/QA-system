@@ -22,7 +22,7 @@ export default function Header() {
 
   const { user, setUser } = useUser();
   const router = useRouter();
-  const [cookies, setCookie, removeCookie] = useCookies(['XSRF-TOKEN']);
+  const [cookies, setCookie, removeCookie] = useCookies(['XSRF-TOKEN', 'laravel_session']);
 
   useEffect(() => {
     const getUser = async () => {
@@ -46,6 +46,7 @@ export default function Header() {
     setUser(null);
     router.push('/signin');
     removeCookie('XSRF-TOKEN');
+    removeCookie('laravel_session');
   }
 
   return (
