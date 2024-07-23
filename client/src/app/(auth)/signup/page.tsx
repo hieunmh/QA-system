@@ -139,11 +139,11 @@ export default function SignUp() {
 
           <Select onValueChange={(value) => setRole(value)}>
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="Teacher" />
+              <SelectValue placeholder="教師" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="teacher">Teacher</SelectItem>
-              <SelectItem value="student">Student</SelectItem>
+              <SelectItem value="teacher">教師</SelectItem>
+              <SelectItem value="student">生徒</SelectItem>
             </SelectContent>
           </Select>
 

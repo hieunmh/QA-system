@@ -11,7 +11,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { useExamPagination } from '@/hooks/useExamPagination';
+import { useExamPagination } from '@/hooks/exam/useExamPagination';
 
 
 export default function ExamPagination() {
