@@ -54,9 +54,26 @@ export default function LeftSidebar() {
     setLoading(false);
   }
 
+  useEffect(() => {
+    const getUser = async () => {
+      
+      if (cookies['XSRF-TOKEN']) {
+        await axiosClient.get('/sanctum/csrf-cookie');
+        await axiosClient.get('/api/user').then(res => {
+          setUser(res.data);
+          
+        }).catch(error => {
+          Promise.reject(error)
+        });
+      }
+    }
+    
+    getUser();
+  }, []);
+
 
   return (
-    <div className='w-[300px] h-full bg-[#4a3aff] rounded-r-xl py-10'>
+    <div className='w-[300px] h-full bg-[#4a3aff] py-10'>
       <div className='flex flex-col justify-between h-full'>
         <div className='flex flex-col space-y-5'>
           {sidebarItem.map((item, index) => (
@@ -87,7 +104,7 @@ export default function LeftSidebar() {
 
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>本当にサインアウトしますか?</DialogTitle>
+                <DialogTitle>本当にログアウトしますか?</DialogTitle>
               </DialogHeader>
 
               <DialogFooter className="flex justify-start font-semibold">

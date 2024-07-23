@@ -22,24 +22,7 @@ export default function Header() {
 
   const { user, setUser } = useUser();
   const router = useRouter();
-  const [cookies, setCookie, removeCookie] = useCookies(['XSRF-TOKEN', 'laravel_session']);
-
-  useEffect(() => {
-    const getUser = async () => {
-      
-      if (cookies['XSRF-TOKEN']) {
-        await axiosClient.get('/sanctum/csrf-cookie');
-        await axiosClient.get('/api/user').then(res => {
-          setUser(res.data);
-          
-        }).catch(error => {
-          Promise.reject(error)
-        });
-      }
-    }
-    
-    getUser();
-  }, []); 
+  const [cookies, setCookie, removeCookie] = useCookies(['XSRF-TOKEN', 'laravel_session']); 
 
   const signout = async () => {
     await axiosClient.post('/logout');

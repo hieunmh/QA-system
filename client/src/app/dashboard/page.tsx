@@ -1,11 +1,12 @@
-import Header from '@/components/header'
-import LeftSidebar from '@/components/sidebar/left-sidebar'
-import React from 'react'
+'use client';
+
+import React, { useEffect } from 'react'
 
 export default function Dashboard() {
+
   return (
-    <div className='w-full h-screen bg-[#fafafc] flex items-center justify-center'>
-      <div className='w- h-full flex'>
+    <div className='w-full h-full bg-[#fafafc] flex items-center justify-center'>
+      <div className='h-full flex'>
       </div>
     </div>
   )
