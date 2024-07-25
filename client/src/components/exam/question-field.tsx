@@ -29,19 +29,19 @@ export default function QuestionField({ index, removeQuestion }: { index: number
   }
 
   return (
-    <div className='space-y-3'>
+    <div className='space-y-3 questions'>
       <div className='w-full flex'>
         <p className='w-[70px]'>問題:</p>
-        <Textarea className='w-[400px]' />
+        <Textarea required className='w-[400px] cnt' />
       </div>
 
       {quantity.map((item, id) => (
         <>
           {item === 1 && (
-            <div key={id} className='w-full flex items-center space-x-1'>
+            <div key={id} className='w-full flex items-center space-x-1 answer'>
               <p className='w-[45px]'>答え: </p>
-              <Checkbox />
-              <input type="text" className='py-2 px-3 border rounded-md w-[400px]' />
+              <input type="checkbox" className='w-4 h-4 text-red-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 ' />
+              <input required type="text" className='py-2 px-3 border rounded-md w-[400px] answercontent' />
               <button  onClick={() => removeAnswer(index)} className='rounded-md text-gray-400 flex items-center justify-center'>
                 <FiPlus size={24} className='rotate-45' />
               </button>

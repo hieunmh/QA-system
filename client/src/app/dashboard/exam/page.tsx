@@ -17,6 +17,8 @@ import { useCreateExam } from '@/hooks/exam/useCreateExam';
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import CreateExamForm from '@/components/exam/create-exam-form';
+import { AnswerType, QuestionType } from '@/types/type';
+import { useCreateQuestion } from '@/hooks/exam/useCreateQuestion';
 
 export default function Exam() {
 
@@ -70,6 +72,8 @@ export default function Exam() {
   const [loading, setLoading] = useState(false);
   const [openForm, setOpenForm] = useState(false);
   const [openCreateForm, setOpenCreateForm] = useState(false);
+  const [answers, setAnswers] = useState<AnswerType[]>([]);
+  const { questions, setQuestions } = useCreateQuestion();
 
   const toggleForm = () => {
     setOpenCreateForm(openForm);
@@ -79,8 +83,48 @@ export default function Exam() {
   }
 
   const backForm = () => {
+    setQuestions([]);
     setOpenCreateForm(false);
     setOpenForm(true);
+  }
+
+  const createQuestions = () => {
+    let ques = document.querySelectorAll('.questions');
+
+    let quess = new Array<QuestionType>();
+
+    ques.forEach((q: any) => {
+      let question = {
+        content: '',
+        answers: new Array<AnswerType>()
+      }
+      
+      let mondai = q.querySelector('.cnt');
+      question.content = mondai.value;
+      let ans = q.querySelectorAll('.answer');
+
+      ans.forEach((a: any) => {
+        let content = a.querySelector('input[type=text]');
+
+        let cb = a.querySelector('input[type=checkbox]:checked');        
+        
+        let answer = {
+          content: content.value,
+          is_correct: cb ? true : false
+        }
+        
+        question.answers.push(answer);
+      })
+      quess.push(question);    
+    })
+    setQuestions(quess);
+    console.log(questions);
+    
+  }
+
+  const getAllQuestions = () => {
+    console.log(questions);
+    
   }
 
   return (
@@ -214,13 +258,13 @@ export default function Exam() {
 
               <DialogFooter className="flex justify-start font-semibold">
                 <DialogClose asChild>
-                  <button className='border w-[120px] border-[#4a3aff] text-[#4a3aff] py-2 rounded-md'>
+                  <button onClick={() => getAllQuestions()} className='border w-[120px] border-[#4a3aff] text-[#4a3aff] py-2 rounded-md'>
                     閉じる  
                   </button>
                 </DialogClose>
 
                 <button onClick={() => {
-                    
+                    createQuestions()
                   }}  
                   className='bg-[#4a3aff] w-[120px] text-white py-2 rounded-md flex items-center justify-center'
                 >

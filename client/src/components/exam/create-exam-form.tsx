@@ -50,9 +50,7 @@ export default function CreateExamForm() {
           <FiPlus size={20} />
           <p>問題を追加</p>
         </button>
-        
       </div>
-
     </ScrollArea>
   )
 }
