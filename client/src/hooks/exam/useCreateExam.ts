@@ -24,5 +24,5 @@ export const useCreateExam = create<useCreateExamType>(set => ({
   setTime: (time: number) => set({ time }),
   setRedo: (redo: boolean) => set({ redo }),
   setReview: (review: boolean) => set({ review }),
-  setSubject: (subject: string) => set ({ subject })
+  setSubject: (subject: string) => set ({ subject }),
 }));

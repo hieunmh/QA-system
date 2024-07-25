@@ -140,6 +140,7 @@ export default function Exam() {
                         <SelectItem value="文学">文学</SelectItem>
                         <SelectItem value="歴史">歴史</SelectItem>
                         <SelectItem value="地理">地理</SelectItem>
+                        <SelectItem value="他の">他の</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
