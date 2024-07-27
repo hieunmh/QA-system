@@ -21,7 +21,7 @@ export default function QuestionField({ index, removeQuestion }: { index: number
 
     const length = newQuantity.filter((item) => item === 1).length;
     
-    if (length == 0) {
+    if (length === 0) {
       return;
     }
     
@@ -36,18 +36,18 @@ export default function QuestionField({ index, removeQuestion }: { index: number
       </div>
 
       {quantity.map((item, id) => (
-        <>
+        <div key={id}>
           {item === 1 && (
-            <div key={id} className='w-full flex items-center space-x-1 answer'>
+            <div className='w-full flex items-center space-x-1 answer'>
               <p className='w-[45px]'>答え: </p>
               <input type="checkbox" className='w-4 h-4 text-red-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 ' />
               <input required type="text" className='py-2 px-3 border rounded-md w-[400px] answercontent' />
-              <button  onClick={() => removeAnswer(index)} className='rounded-md text-gray-400 flex items-center justify-center'>
+              <button  onClick={() => removeAnswer(id)} className='rounded-md text-gray-400 flex items-center justify-center'>
                 <FiPlus size={24} className='rotate-45' />
               </button>
             </div>
           )}
-        </>
+        </div>
       ))}
 
       <div className='flex justify-between'>

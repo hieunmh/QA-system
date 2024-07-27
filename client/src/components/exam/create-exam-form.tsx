@@ -37,13 +37,13 @@ export default function CreateExamForm() {
       <div id='questions' className='flex flex-col space-y-5'>
 
         {quantity.map((item, index) => (
-          <>
+          <div key={index}>
             {item === 1 && (
-              <div key={index} className='bg-[#f5f5f5] shadow-md p-4 rounded-xl'>
+              <div className='bg-[#f5f5f5] shadow-md p-4 rounded-xl'>
                 <QuestionField index={index} removeQuestion={removeQuestion} />
               </div>
             )}
-          </>
+          </div>
         ))}
 
         <button onClick={() => addQuestion()} className='hover:underline flex items-center justify-center'>

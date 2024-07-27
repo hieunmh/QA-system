@@ -15,6 +15,7 @@ class Exam extends Model
         'code',
         'review',
         'redo',
-        'time'
+        'time',
+        'subject'
     ];
 }

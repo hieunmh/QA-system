@@ -19,6 +19,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import CreateExamForm from '@/components/exam/create-exam-form';
 import { AnswerType, QuestionType } from '@/types/type';
 import { useCreateQuestion } from '@/hooks/exam/useCreateQuestion';
+import axiosClient from '@/lib/axios';
 
 export default function Exam() {
 
@@ -88,43 +89,38 @@ export default function Exam() {
     setOpenForm(true);
   }
 
-  const createQuestions = () => {
-    let ques = document.querySelectorAll('.questions');
+  const createQuestions = async () => {
+    let allQuestion = document.querySelectorAll('.questions');
 
-    let quess = new Array<QuestionType>();
+    let qs = new Array<QuestionType>();
 
-    ques.forEach((q: any) => {
+    allQuestion.forEach((q: any) => {
+      let questionContent = q.querySelector('.cnt');
+      
       let question = {
-        content: '',
+        content: questionContent.value,
         answers: new Array<AnswerType>()
       }
+
+      let allAsnwerField = q.querySelectorAll('.answer');
       
-      let mondai = q.querySelector('.cnt');
-      question.content = mondai.value;
-      let ans = q.querySelectorAll('.answer');
+      allAsnwerField.forEach((answer: any) => {
+        let content = answer.querySelector('input[type=text]');
+        let cb = answer.querySelector('input[type=checkbox]:checked');
 
-      ans.forEach((a: any) => {
-        let content = a.querySelector('input[type=text]');
-
-        let cb = a.querySelector('input[type=checkbox]:checked');        
-        
-        let answer = {
+        question.answers.push({
           content: content.value,
           is_correct: cb ? true : false
-        }
-        
-        question.answers.push(answer);
-      })
-      quess.push(question);    
-    })
-    setQuestions(quess);
-    console.log(questions);
-    
-  }
+        })
+      });
+      qs.push(question);
+    });
 
-  const getAllQuestions = () => {
-    console.log(questions);
-    
+
+    await axiosClient.post('/api/createExam', qs).then(res => {
+      console.log(res.data);
+
+    })
   }
 
   return (
@@ -258,7 +254,7 @@ export default function Exam() {
 
               <DialogFooter className="flex justify-start font-semibold">
                 <DialogClose asChild>
-                  <button onClick={() => getAllQuestions()} className='border w-[120px] border-[#4a3aff] text-[#4a3aff] py-2 rounded-md'>
+                  <button className='border w-[120px] border-[#4a3aff] text-[#4a3aff] py-2 rounded-md'>
                     閉じる  
                   </button>
                 </DialogClose>

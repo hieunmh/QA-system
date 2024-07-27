@@ -15,6 +15,7 @@ return new class extends Migration
             $table->uuid('id');
             $table->uuid('user_id');
             $table->string('code')->unique();
+            $table->string('subject');
             $table->integer('time');
             $table->boolean('redo');
             $table->boolean('review');
