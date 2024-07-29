@@ -14,3 +14,14 @@ export type QuestionType = {
   content: string;
   answers: AnswerType[]
 }
+
+export type ExamType = {
+  id: string;
+  code: string;
+  redo: boolean;
+  review: boolean;
+  subject: string;
+  time: number;
+  created_at: string;
+  questions: QuestionType[]
+}

@@ -10,12 +10,10 @@ import QuestionField from './question-field';
 
 export default function CreateExamForm() {
 
-
   const [quantity, setQuantity] = useState([1]);
 
   const addQuestion = () => {
     setQuantity([...quantity, 1]);
-
   }
 
   const removeQuestion = (index: number) => {    
@@ -30,7 +28,6 @@ export default function CreateExamForm() {
     
     setQuantity(newQuantity);    
   }
-
 
   return (
     <ScrollArea className='w-[570px] max-h-[600px] px-5'>

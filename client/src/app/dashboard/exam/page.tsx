@@ -1,102 +1,55 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import ExamHeader from '@/components/exam/header';
 import ExamPagination from '@/components/exam/pagination';
 import { FaPlus } from "react-icons/fa6";
-import { FaEdit } from "react-icons/fa";
 import { IoMdTrash, IoMdArrowRoundBack } from "react-icons/io";
 import { useExamPagination } from '@/hooks/exam/useExamPagination';
 import randomstring from 'randomstring';
 
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { LuLoader2 } from 'react-icons/lu';
 import { useCreateExam } from '@/hooks/exam/useCreateExam';
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import CreateExamForm from '@/components/exam/create-exam-form';
 import { AnswerType, QuestionType } from '@/types/type';
-import { useCreateQuestion } from '@/hooks/exam/useCreateQuestion';
 import axiosClient from '@/lib/axios';
+import { useUser } from '@/hooks/useUser';
+import { useExam } from '@/hooks/exam/useExam';
+import Link from 'next/link';
+import { toast } from '@/components/ui/use-toast';
 
 export default function Exam() {
-
-  const examList = [
-    {
-      name: '数学',
-      questionNumber: 10,
-      time: 30,
-      code: 'abcxyz',
-      doneNumber: 1
-    },
-    {
-      name: '物理',
-      questionNumber: 8,
-      time: 25,
-      code: 'abcxyz',
-      doneNumber: 4
-    },
-    {
-      name: '英語',
-      questionNumber: 50,
-      time: 45,
-      code: 'abcxyz',
-      doneNumber: 25
-    },
-    {
-      name: '化学',
-      questionNumber: 20,
-      time: 15,
-      code: 'abcxyz',
-      doneNumber: 1
-    },
-    {
-      name: '文学',
-      questionNumber: 25,
-      time: 50,
-      code: 'abcxyz',
-      doneNumber: 26
-    },
-    {
-      name: '歴史',
-      questionNumber: 15,
-      time: 30,
-      code: 'abcxyz',
-      doneNumber: 11
-    },
-  ];
-
-  const { page, perPage } = useExamPagination();
-  const { code, setCode, time, setTime, setRedo, setReview, setSubject } = useCreateExam();
+  const { page, perPage, pageNumber, setPageNumber } = useExamPagination();
+  const { code, setCode, time, setTime, redo, setRedo, review, setReview, subject, setSubject } = useCreateExam();
+  const { exams, setExams } = useExam();
   const [loading, setLoading] = useState(false);
   const [openForm, setOpenForm] = useState(false);
   const [openCreateForm, setOpenCreateForm] = useState(false);
-  const [answers, setAnswers] = useState<AnswerType[]>([]);
-  const { questions, setQuestions } = useCreateQuestion();
+  const { user } = useUser();
 
-  const toggleForm = () => {
-    setOpenCreateForm(openForm);
+  const resetForm = () => {
     setCode(randomstring.generate({ length: 10, charset: ['alphanumeric'] }));
-    setOpenForm(!openForm);
     setTime(1);
+    setRedo(true);
+    setReview(true);
+    setSubject('数学');
   }
 
   const backForm = () => {
-    setQuestions([]);
     setOpenCreateForm(false);
     setOpenForm(true);
   }
 
   const createQuestions = async () => {
     let allQuestion = document.querySelectorAll('.questions');
-
     let qs = new Array<QuestionType>();
 
     allQuestion.forEach((q: any) => {
       let questionContent = q.querySelector('.cnt');
-      
       let question = {
         content: questionContent.value,
         answers: new Array<AnswerType>()
@@ -116,12 +69,53 @@ export default function Exam() {
       qs.push(question);
     });
 
+    setLoading(true);
 
-    await axiosClient.post('/api/createExam', qs).then(res => {
-      console.log(res.data);
+    await axiosClient.post('/api/createExam', {
+      user_id: user?.id,
+      code: code,
+      subject: subject,
+      time: time,
+      redo: redo,
+      review: review,
+      questions: qs
+    }).then(async (res) => {
+      toast({
+        description: 'テストの作成に成功しました！'
+      });
 
-    })
+      await axiosClient.get('/api/getExams').then(res => {
+        setPageNumber(Math.ceil(res.data.length / perPage));
+        setExams(res.data);
+      });
+
+
+    }).catch(err => {
+      toast({
+        description: '問題が発生しました！'
+      })
+    }).then(() => {
+      setLoading(false);
+      setOpenCreateForm(false);
+      setOpenForm(false);
+      resetForm();
+    });
   }
+
+  useEffect(() => {
+    const getExam = async () => {
+      if (exams.length == 0) {
+        await axiosClient.get('/api/getExams').then(res => {
+          setPageNumber(Math.ceil(res.data.length / perPage));
+          setExams(res.data);
+        }).catch(err => {
+          setExams([]);
+        })
+      }
+    }
+
+    getExam();
+  }, [])
 
   return (
     <div className='w-full bg-[#fafafc]'>
@@ -279,33 +273,24 @@ export default function Exam() {
           <div className='h-full w-full py-5'>
             <div className='h-full w-full rounded-md p-5 bg-white shadow-lg'>
               <div className='w-full grid grid-cols-12 font-semibold text-sm border-b pb-5'>
-                <div className='col-span-1 text-center'>番</div>
+                <div className='col-span-2 text-center'>番</div>
                 <div className='col-span-2 text-center'>主題</div> 
                 <div className='col-span-2 text-center'>コード</div> 
                 <div className='col-span-2 text-center'>質問数</div> 
-                <div className='col-span-1 text-center'>時間（分）</div> 
+                <div className='col-span-2 text-center'>時間（分）</div> 
                 <div className='col-span-2 text-center'>やったの数</div> 
-                <div className='col-span-2 text-center'>アクション</div>
               </div>
 
               <div className='w-full'>
-                {examList.slice(perPage * (page - 1), perPage * page).map((exam, index) => (
-                  <div key={index} className='w-full grid grid-cols-12 border-b py-5 cursor-pointer hover:bg-gray-50'>
-                    <div className='col-span-1 text-center'>{perPage * (page - 1) + index + 1}</div>
-                    <div className='col-span-2 text-center'>{exam.name}</div> 
+                {exams.slice(perPage * (page - 1), perPage * page).map((exam, index) => (
+                  <Link href={`exam/${exam.code}`} key={index} className='w-full grid grid-cols-12 border-b py-5 cursor-pointer hover:bg-gray-50'>
+                    <div className='col-span-2 text-center'>{perPage * (page - 1) + index + 1}</div>
+                    <div className='col-span-2 text-center'>{exam.subject}</div> 
                     <div className='col-span-2 text-center'>{exam.code}</div> 
-                    <div className='col-span-2 text-center'>{exam.questionNumber}</div> 
-                    <div className='col-span-1 text-center'>{exam.time}</div>
-                    <div className='col-span-2 text-center'>{exam.doneNumber}</div> 
-                    <div className='col-span-2 text-center flex items-center justify-center space-x-2'>
-                      <button>
-                        <FaEdit size={20} />
-                      </button>
-                      <button>
-                        <IoMdTrash size={20} />
-                      </button>
-                    </div>
-                  </div>
+                    <div className='col-span-2 text-center'>{exam.questions.length}</div> 
+                    <div className='col-span-2 text-center'>{exam.time}</div>
+                    <div className='col-span-2 text-center'>0</div> 
+                  </Link>
                 ))}
               </div>
             </div>

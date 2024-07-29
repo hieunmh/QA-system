@@ -4,13 +4,15 @@ interface ExamPaginationType {
   page: number,
   perPage: number;
   pageNumber: number;
-  setPage: (page: number) => void
+  setPage: (page: number) => void;
+  setPageNumber: (pageNumber: number) => void;
 }
 
 
 export const useExamPagination = create<ExamPaginationType>(set => ({
   page: 1,
-  perPage: 3,
-  pageNumber:2,
-  setPage: (page: number) => set({ page })
+  perPage: 2,
+  pageNumber: 1,
+  setPage: (page: number) => set({ page }),
+  setPageNumber: (pageNumber: number) => set({ pageNumber })
 }));
