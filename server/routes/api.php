@@ -21,4 +21,8 @@ Route::middleware(['auth:sanctum'])->group(function() {
         return $request->user();
     });
     Route::post('/createExam', [ExamController::class, 'createExam']);
+
+    Route::get('/getExam', [ExamController::class, 'getExam']);
+
+    Route::get('/getExams', [ExamController::class, 'getExams']);
 });

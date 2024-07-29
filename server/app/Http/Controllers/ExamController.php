@@ -7,6 +7,8 @@ use App\Models\Exam;
 use App\Service\AnswerService;
 use App\Service\QuestionService;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class ExamController extends Controller
 {
@@ -25,7 +27,6 @@ class ExamController extends Controller
 
         try {
             $res = Exam::create($exam);
-            
             $contents = $this->questionService->createQuestion($questions, $res->id);
 
             for ($i = 0; $i < count($contents); $i++) {
@@ -36,13 +37,33 @@ class ExamController extends Controller
                 'status' => Response::HTTP_CREATED,
                 'msg' => 'Create exam successfully!',
             ], Response::HTTP_CREATED);
-
         } catch (\Exception $e) {
-            
             return response()->json([
                 'status' => Response::HTTP_BAD_REQUEST,
                 'msg' => $e->getMessage()
             ], Response::HTTP_BAD_REQUEST); 
         }
+    }
+
+    public function getExams() {
+        $user_id = Auth::user()->id;
+
+        $exam = Exam::with(['questions', 'questions.answers'])->where([
+            'user_id' => $user_id
+        ])->get();
+
+        return $exam;
+    }
+
+    public function getExam(Request $request) {
+        
+        $user_id = Auth::user()->id;
+
+        $exam = Exam::with(['questions', 'questions.answers'])->where([
+            'code' => $request->code,
+            'user_id' => $user_id
+        ])->first();
+
+        return $exam;
     }
 }
