@@ -4,27 +4,33 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateExamRequest;
 use App\Models\Exam;
+use App\Service\AnswerService;
 use App\Service\QuestionService;
-// use App\Service\QuestionService;
 use Illuminate\Http\Response;
 
 class ExamController extends Controller
 {
     protected QuestionService $questionService;
+    protected AnswerService $answerService;
 
-    public function __construct(QuestionService $questionService) {
+    public function __construct(QuestionService $questionService, AnswerService $answerService) {
         $this->questionService = $questionService;
+        $this->answerService = $answerService;
     }
 
     public function createExam(CreateExamRequest $request) {
         $exam = $request->except(['questions']);
 
-        $questions = $request->only(['questions']);
+        $questions = $request->only(['questions'])['questions'];
 
         try {
             $res = Exam::create($exam);
             
-            $this->questionService->createQuestion(array_values($questions), $res->id);
+            $contents = $this->questionService->createQuestion($questions, $res->id);
+
+            for ($i = 0; $i < count($contents); $i++) {
+                $this->answerService->createAnswers($questions[$i]['answers'], $contents[$i]['id']);
+            }
             
             return response()->json([
                 'status' => Response::HTTP_CREATED,

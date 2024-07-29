@@ -11,13 +11,16 @@ class QuestionService
         $contents = [];
 
         for ($i = 0; $i < count($questions[0]); $i++) {
+
             array_push($contents, [
                 'id' => (string) Str::uuid(),
                 'exam_id' => $exam_id,
-                'content' => $questions[0][$i]['content']
+                'content' => $questions[$i]['content']
             ]);
         }
 
-        Question::insert($contents);
+        $res = Question::insert($contents);
+
+        return $contents;
     }
 }
