@@ -102,7 +102,7 @@
 </template>
 
 <script setup lang="ts">
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogClose, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { NumberField, NumberFieldContent, NumberFieldDecrement, NumberFieldIncrement, NumberFieldInput } from '@/components/ui/number-field';
 import { Button } from '@/components/ui/button';
@@ -114,19 +114,12 @@ import { useModalStore } from '~/stores/modal';
 const examStore = useExamStore();
 const modalStore = useModalStore();
 
-const toggleOpen = (open: boolean) => {
-  modalStore.isOpenExamForm = open;
-}
-
 const autoGenCode = () => {
   examStore.code = randomstring({ length: 10 })
 }
 
 const createExam = () => {
-  console.log(examStore.code);
-  console.log(examStore.subject);
-  console.log(examStore.time);
-  console.log(examStore.review);
-  console.log(examStore.redo);
+  modalStore.isOpenExamForm = false;
+  modalStore.isOpenQuestionForm = true;
 }
 </script>

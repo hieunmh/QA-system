@@ -4,8 +4,35 @@
       <div class="w-full h-full space-y-4">
         <div class="flex justify-between items-center">
           <p class="text-2xl font-semibold">テスト</p>
-
           <ExamCreateButton />
+
+          <Dialog :open="modalStore.isOpenQuestionForm">
+            <DialogTrigger class="hidden">
+            </DialogTrigger>
+            <DialogContent class="bg-[#f6f5ff] border-0 m-0 gap-0">
+              <DialogHeader>
+                <DialogTitle class="text-center">コード: {{ examStore.code }}</DialogTitle>
+                <DialogDescription>
+                  
+                </DialogDescription>
+              </DialogHeader>
+
+              <div v-for="item, index in questionQuantity" class="w-full">
+                <ExamCreateQuestion :class="item === 0 && 'hidden h-0'" v-show="item === 1" :id="index" :visible="item" :remove="removeQuestion" />
+              </div>
+
+              <div class="w-full flex justify-between items-center">
+                <button @click="addQuestion()" class="flex items-center font-semibold space-x-1 hover:underline">
+                  <Icon name="material-symbols:add-circle-outline-rounded" size="24" />
+                  <p>質問を追加</p>
+                </button>
+                <div class="flex space-x-2">
+                  <Button variant="outline" @click="backModel()">戻す</Button>
+                  <Button>作成</Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
 
         <div class="w-full h-[calc(100%-128px)] bg-white shadow-lg border rounded-md p-5">
@@ -29,11 +56,10 @@
         </div>
 
         <div class="w-full flex items-center justify-center">
-          <Pagination v-slot="{ page }" :total="examList.length * 10" :sibling-count="1" show-edges :default-page="2">
+          <Pagination v-slot="{ page }" :total="examList.length * 10" :sibling-count="1" show-edges :default-page="1">
             <PaginationList v-slot="{ items }" class="flex items-center gap-1">
               <PaginationFirst />
               <PaginationPrev />
-
               <template v-for="(item, index) in items">
                 <PaginationListItem v-if="item.type === 'page'" :key="index" :value="item.value" as-child>
                   <Button class="w-10 h-10 p-0" :variant="item.value === page ? 'default' : 'outline'">
@@ -42,7 +68,6 @@
                 </PaginationListItem>
                 <PaginationEllipsis v-else :key="item.type" :index="index" />
               </template>
-
               <PaginationNext />
               <PaginationLast />
             </PaginationList>
@@ -57,15 +82,23 @@
 import DashboardLayout from '~/layouts/DashboardLayout.vue';
 
 import { Pagination, PaginationEllipsis, PaginationFirst, PaginationLast, PaginationList, PaginationListItem, PaginationNext, PaginationPrev } from '@/components/ui/pagination';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button'; 
-import axiosClient from '~/lib/axios';
+import { useModalStore } from '~/stores/modal';
+import { useExamStore } from '~/stores/exam';
 
-// onMounted(async () => {
-//   await axiosClient.get('/api/exams').then(res => {
-//     console.log(res.data);
-//   })
-// })
+const modalStore = useModalStore();
+const examStore = useExamStore();
+
+let questionQuantity = ref([1]);
+
+const addQuestion = () => {
+  questionQuantity.value.push(1);
+}
+
+const removeQuestion = (index: number) => {
+  questionQuantity.value[index] = 0;  
+}
 
 const examList = [
   {
@@ -98,5 +131,9 @@ const examList = [
   },
 ];
 
+const backModel = () => {
+  modalStore.isOpenQuestionForm = false;
+  modalStore.isOpenExamForm = true;
+}
 
 </script>
