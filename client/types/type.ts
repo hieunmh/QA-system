@@ -3,4 +3,9 @@ export type UserType = {
   email: string;
   name: string;
   role: string;
+  image: string;
+}
+
+export type PaginationType = {
+  
 }

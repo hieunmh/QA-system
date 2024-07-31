@@ -18,6 +18,6 @@
 </template>
 
 <script setup lang="ts">
-// definePageMeta({ middleware: 'is-logged-in' });
+definePageMeta({ middleware: 'is-logged-in' });
 
 </script>

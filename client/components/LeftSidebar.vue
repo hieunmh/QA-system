@@ -65,5 +65,4 @@ const logout = async () => {
   router.push('/signin');
 }
 
-
 </script>

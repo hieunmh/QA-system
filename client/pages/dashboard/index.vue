@@ -1,6 +1,6 @@
 <template>
   <DashboardLayout>
-    <div>
+    <div class="bg-[#fafafc] h-full">
       123
     </div>
   </DashboardLayout>

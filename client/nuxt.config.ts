@@ -7,5 +7,11 @@ export default defineNuxtConfig({
     "shadcn-nuxt", 
     "@nuxt/icon",
     "@pinia/nuxt"
-  ]
+  ],
+  runtimeConfig: {
+    public: {
+      NUXT_PUBLIC_API_URL: process.env.NUXT_PUBLIC_API_URL
+    }
+  }
+
 })

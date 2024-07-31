@@ -27,7 +27,7 @@
 
         <div class="text-end hover:underline text-sm font-semibold cursor-pointer">パスワードをお忘れの方</div>
 
-        <Button @click="signin()" class="bg-common mt-5 w-full hover:bg-common/90 py-6">
+        <Button @click.prevent="signin()" class="bg-common mt-5 w-full hover:bg-common/90 py-6">
           <Icon v-if="isLoading"name="icon-park-outline:loading-four" size="24" class="animate-spin"/>
           <p v-else>ログイン</p>
         </Button>
