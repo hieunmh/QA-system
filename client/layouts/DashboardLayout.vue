@@ -33,14 +33,26 @@
 <script setup lang="ts">
 import { Icon } from '#components';
 import { Skeleton } from '@/components/ui/skeleton';
+import axiosClient from '~/lib/axios';
 import { useUserStore } from '~/stores/user';
+import { useExamsStore } from '~/stores/exams';
+
 
 let isLoading = ref(false);
 
 const userStore = useUserStore();
+const examsStore = useExamsStore();
 
 const searching = async () => {
   isLoading.value = true;
 }
+
+onMounted(async () => {
+  if (examsStore.exams?.length == 0) {
+    await axiosClient.get('/api/exams').then(res => {
+      examsStore.exams = res.data;
+    })
+  }
+})
 
 </script>
