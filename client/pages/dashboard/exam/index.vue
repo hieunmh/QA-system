@@ -16,10 +16,12 @@
                   
                 </DialogDescription>
               </DialogHeader>
-
-              <div v-for="item, index in questionQuantity" class="w-full">
-                <ExamCreateQuestion :class="item === 0 && 'hidden h-0'" v-show="item === 1" :id="index" :visible="item" :remove="removeQuestion" />
-              </div>
+              
+              <ScrollArea class="max-h-[600px] px-4 pb-4">
+                <div v-for="item, index in questionQuantity" class="w-full">
+                  <ExamCreateQuestion :class="item === 0 && 'hidden h-0'" v-show="item === 1" :id="index" :visible="item" :remove="removeQuestion" />
+                </div>
+              </ScrollArea>
 
               <div class="w-full flex justify-between items-center">
                 <button @click="addQuestion()" class="flex items-center font-semibold space-x-1 hover:underline">
@@ -28,7 +30,7 @@
                 </button>
                 <div class="flex space-x-2">
                   <Button variant="outline" @click="backModel()">戻す</Button>
-                  <Button>作成</Button>
+                  <Button @click="submitExam()">作成</Button>
                 </div>
               </div>
             </DialogContent>
@@ -79,24 +81,35 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({ middleware: 'is-logged-out' });
 import DashboardLayout from '~/layouts/DashboardLayout.vue';
 
 import { Pagination, PaginationEllipsis, PaginationFirst, PaginationLast, PaginationList, PaginationListItem, PaginationNext, PaginationPrev } from '@/components/ui/pagination';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button'; 
 import { useModalStore } from '~/stores/modal';
 import { useExamStore } from '~/stores/exam';
+import { useUserStore } from '~/stores/user';
+import type { QuestionType } from '~/types/type';
+import axiosClient from '~/lib/axios';
 
 const modalStore = useModalStore();
 const examStore = useExamStore();
+const userStore = useUserStore();
 
 let questionQuantity = ref([1]);
+let questionsList = ref<QuestionType[]>([]);
 
 const addQuestion = () => {
   questionQuantity.value.push(1);
 }
 
 const removeQuestion = (index: number) => {
+  let visibleQuetion = questionQuantity.value.filter(value => value === 1).length;
+
+  if (visibleQuetion === 1) return;
+
   questionQuantity.value[index] = 0;  
 }
 
@@ -134,6 +147,47 @@ const examList = [
 const backModel = () => {
   modalStore.isOpenQuestionForm = false;
   modalStore.isOpenExamForm = true;
+}
+
+const submitExam = async () => {
+  let questions = document.querySelectorAll('.questions');
+  
+  questions.forEach(q => {
+    let ques = ref<QuestionType>({
+      content: '',
+      answers: []
+    });
+
+    let content = q.querySelector('input');
+    ques.value!.content = content?.value || '';
+    let answers = q.querySelectorAll('.answers');
+    answers.forEach(a  => {
+      let answerContent = a.querySelector('input')    
+      let checkbox = a.querySelector('[role=checkbox] span');      
+
+      ques.value?.answers.push({
+        content: answerContent?.value || '',
+        is_correct: checkbox ? true : false
+      })
+    })
+    
+    questionsList.value.push(ques.value);
+  });
+
+  await axiosClient.post('/api/createExam', {
+    user_id: userStore.user?.id,
+    code: examStore.code,
+    subject: examStore.subject,
+    time: examStore.time,
+    redo: examStore.redo === 'true',
+    review: examStore.review === 'true',
+    questions: questionsList.value
+  }).then(res => {
+    console.log(res.data);
+  }).catch(err => {
+    console.log(err);
+  })
+
 }
 
 </script>

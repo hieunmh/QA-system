@@ -6,6 +6,12 @@ export type UserType = {
   image: string;
 }
 
-export type PaginationType = {
-  
+export type QuestionType = {
+  content: string;
+  answers: AnswerType[]
+}
+
+export type AnswerType = {
+  content: string;
+  is_correct: boolean;
 }

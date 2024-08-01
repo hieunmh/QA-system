@@ -1,12 +1,12 @@
 <template>
   <div class="w-full bg-white p-4 rounded-md shadow-lg mb-5 border">
-    <div class="w-full space-y-3">
+    <div class="w-full space-y-3" :class="visible === 1 && 'questions'">
       <input type="text" class="w-full bg-[#f2f3f4] outline-none py-2 px-3 rounded-sm placeholder:font-semibold" placeholder="問題">
 
       <div v-for="item, index in answerQuantity" class="w-full">
-        <div v-show="item === 1" class="flex space-x-2 items-center">
+        <div v-show="item === 1" class="flex space-x-2 items-center" :class="item === 1 && 'answers'">
           <Checkbox class="h-5 w-5" />
-          <input type="text" class="w-full border-b-[1.5px] border-b-gray-300 outline-none px-3 placeholder:font-semibold">
+          <input type="text" class="w-full border-dashed border-b-[1.5px] border-b-gray-300 outline-none px-3 placeholder:font-semibold">
           <button @click="removeAnswer(index)">
             <Icon name="ic:round-close" size="24" class="" />
           </button>
