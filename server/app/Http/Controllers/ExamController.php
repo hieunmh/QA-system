@@ -28,7 +28,6 @@ class ExamController extends Controller
         try {
             $res = Exam::create($exam);
             $contents = $this->questionService->createQuestion($questions, $res->id);
-
             for ($i = 0; $i < count($contents); $i++) {
                 $this->answerService->createAnswers($questions[$i]['answers'], $contents[$i]['id']);
             }

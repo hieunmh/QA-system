@@ -9,18 +9,14 @@ class QuestionService
 {
     public function createQuestion($questions, $exam_id) {
         $contents = [];
-
-        for ($i = 0; $i < count($questions[0]); $i++) {
-
+        for ($i = 0; $i < count($questions); $i++) {
             array_push($contents, [
                 'id' => (string) Str::uuid(),
                 'exam_id' => $exam_id,
                 'content' => $questions[$i]['content']
             ]);
         }
-
-        $res = Question::insert($contents);
-
+        Question::insert($contents);
         return $contents;
     }
 }
