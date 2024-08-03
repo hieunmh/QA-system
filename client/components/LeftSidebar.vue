@@ -48,7 +48,7 @@
 <script setup lang="ts">
 import { Button } from './ui/button';
 import { Icon } from '#components';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
 import axiosClient from '~/lib/axios';
 const token = useCookie('XSRF-TOKEN');
 const role = useCookie('r');
