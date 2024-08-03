@@ -56,6 +56,7 @@ import { Icon } from '#components';
 import axiosClient from '~/lib/axios';
 import { useUserStore } from '~/stores/user';
 
+
 let email = ref('');
 let password = ref('');
 let emailError = ref('');
@@ -66,6 +67,7 @@ let isLoading = ref(false);
 
 const userStore = useUserStore();
 const router = useRouter();
+const cookie = useCookie('r');
 
 const toggleShowPassword = () => {
   if (showPassword.value) showPassword.value = false;
@@ -105,7 +107,9 @@ const signin = async () => {
   await axiosClient.post('/login', { email: email.value, password: password.value }).then(async res => {
     const user = (await axiosClient.get('/api/user')).data;
     userStore.user = user;
-    router.push('/dashboard');
+    cookie.value = user.role;
+    if (user.role === 'teacher') router.push('/dashboard');
+    else if (user.role === 'student') router.push('/student');
 
   }).catch(err => {
     serverError.value = 'メールアドレスまたはパスワードが間違っています。';

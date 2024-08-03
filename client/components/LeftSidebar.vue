@@ -51,6 +51,7 @@ import { Icon } from '#components';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog'
 import axiosClient from '~/lib/axios';
 const token = useCookie('XSRF-TOKEN');
+const role = useCookie('r');
 
 let isLoading = ref(false);
 
@@ -61,6 +62,7 @@ const logout = async () => {
   isLoading.value = true;
   await axiosClient.post('/logout');
   token.value = null;
+  role.value = null;
   isLoading.value = false;
   router.push('/signin');
 }

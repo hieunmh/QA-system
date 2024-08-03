@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ middleware: 'is-logged-out' });
+definePageMeta({ middleware: ['is-logged-out', 'is-logged-in'] });
 import DashboardLayout from '~/layouts/DashboardLayout.vue';
 import { useUserStore } from '~/stores/user';
 

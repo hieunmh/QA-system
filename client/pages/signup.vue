@@ -89,6 +89,7 @@ let isLoading = ref(false);
 
 const router = useRouter();
 const store = useUserStore();
+const cookie = useCookie('r');
 
 const toggleShowPassword = () => {
   if (showPassword.value) showPassword.value = false;
@@ -140,7 +141,10 @@ const signup = async () => {
   }).then( async res => {
     const user = (await axiosClient.get('/api/user')).data;
     store.user = user;
-    router.push('/dashboard');
+    role.value = user.role;
+    if (user.role === 'teacher') router.push('/dashboard');
+    else if (user.role === 'student') router.push('/student');
+
   }).catch(err => {
     serverError.value = 'ユーザーが登録されました。';
   }).finally(() => {
