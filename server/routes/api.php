@@ -22,7 +22,7 @@ Route::middleware(['auth:sanctum'])->group(function() {
     });
     Route::post('/createExam', [ExamController::class, 'createExam']);
 
-    Route::get('/exam', [ExamController::class, 'getExam']);
+    Route::get('/exam/{code}', [ExamController::class, 'getExam']);
 
     Route::get('/exams', [ExamController::class, 'getExams']);
 });

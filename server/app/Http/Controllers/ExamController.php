@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateExamRequest;
+use App\Http\Requests\GetExamRequest;
 use App\Models\Exam;
 use App\Service\AnswerService;
 use App\Service\QuestionService;
@@ -54,13 +55,10 @@ class ExamController extends Controller
         return $exam;
     }
 
-    public function getExam(Request $request) {
-        
-        $user_id = Auth::user()->id;
+    public function getExam($code) {    
 
         $exam = Exam::with(['questions', 'questions.answers'])->where([
-            'code' => $request->code,
-            'user_id' => $user_id
+            'code' => $code,
         ])->first();
 
         return $exam;

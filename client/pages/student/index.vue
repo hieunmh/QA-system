@@ -32,29 +32,61 @@
       <p class="h-4"></p>
       <Skeleton class="w-[150px] h-10" />
     </div>
+
+    <Dialog :open="isOpenDialog">
+      <DialogTrigger class="hidden">
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>
+            <div class="flex justify-center flex-col items-center space-y-3">
+              <p class="font-semibold">主題: {{ examStore.subject }}</p>
+              <p class="text-sm">時間: {{ examStore.time }} 分</p>
+            </div>
+          </DialogTitle>
+        </DialogHeader>
+
+        <Button @click="takeExam()">
+          テストを受けます
+        </Button>
+      </DialogContent>
+    </Dialog>
   </StudentLayout>
 </template>
 
 <script setup lang="ts">
 definePageMeta({ middleware: ['is-logged-in', 'is-logged-out'] });
 import { useUserStore } from '~/stores/user';
+import { useExamStore } from '~/stores/exam';
 import StudentLayout from '~/layouts/StudentLayout.vue'; 
 import { PinInput, PinInputGroup, PinInputInput } from '@/components/ui/pin-input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '~/components/ui/button';
+import axiosClient from '~/lib/axios';
+import { toast } from 'vue-sonner';
 
 const userStore = useUserStore();
+const examStore = useExamStore();
 const value = ref<string[]>([]);
+const router = useRouter();
+
 let isLoading = ref(false);
 let codeError = ref('');
+let isOpenDialog = ref(false);
+
 
 watch(() => value.value, () => {
   if (value.value.length === 10) {
     codeError.value = '';
   }
-})
+});
 
-const joinExam = () => {
+const takeExam = () => {
+  router.push('/student/exam');
+}
+
+const joinExam = async () => {
   if (value.value.length < 10) {
     codeError.value = '10 文字すべてを入力してください。'
     return;
@@ -64,7 +96,22 @@ const joinExam = () => {
   let code = '';
   value.value.forEach(c => code += c);
   isLoading.value = true;
+  const res = (await axiosClient.get(`/api/exam/${code}`)).data;
   
+  if (!res) {
+    toast.error('テストが見つかりません。');
+    isLoading.value = false;
+    return;
+  }
+
+  isOpenDialog.value = true;
+  examStore.code = res.code;
+  examStore.subject = res.subject;
+  examStore.time = res.time;
+  examStore.questions = res.questions;
+  examStore.redo = res.redo;
+  examStore.review = res.review;
+  isLoading.value = false;
 }
 
 </script>
