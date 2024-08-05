@@ -19,4 +19,8 @@ class QuestionService
         Question::insert($contents);
         return $contents;
     }
+
+    public function shuffleQuestion($questions) {
+        return $questions->shuffle();
+    }
 }

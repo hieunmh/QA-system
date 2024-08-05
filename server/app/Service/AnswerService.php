@@ -20,6 +20,9 @@ class AnswerService
     }
 
     Answer::insert($insertAnswers);
+  }
 
+  public function shuffleAnswer($answers) {
+    return $answers->shuffle();
   }
 }

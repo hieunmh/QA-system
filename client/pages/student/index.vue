@@ -96,7 +96,7 @@ const joinExam = async () => {
   let code = '';
   value.value.forEach(c => code += c);
   isLoading.value = true;
-  const res = (await axiosClient.get(`/api/exam/${code}`)).data;
+  const res = (await axiosClient.get(`/api/exam/${code}`)).data.data;
   
   if (!res) {
     toast.error('テストが見つかりません。');

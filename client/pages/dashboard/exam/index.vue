@@ -18,7 +18,7 @@
               </DialogHeader>
               
               <ScrollArea class="max-h-[600px] px-4 pb-4">
-                <div v-for="item, index in questionQuantity" class="w-full">
+                <div v-for="item, index in questionQuantity" :key="index" class="w-full">
                   <ExamCreateQuestion :class="item === 0 && 'hidden h-0'" v-show="item === 1" :id="index" :visible="item" :remove="removeQuestion" />
                 </div>
               </ScrollArea>
@@ -50,7 +50,7 @@
             <div class="col-span-2 text-center">時間(分)</div>
           </div>
           
-          <NuxtLink :to="`/dashboard/exam/${exam.code}`" v-for="(exam, index) in examsStore.exams" class="grid grid-cols-12 font-normal py-5 hover:bg-gray-50 border-t">
+          <NuxtLink :to="`/dashboard/exam/${exam.code}`" v-for="(exam, index) in examsStore.exams" :key="index" class="grid grid-cols-12 font-normal py-5 hover:bg-gray-50 border-t">
             <div class="col-span-2 text-center">{{ index + 1 }}</div>
             <div class="col-span-2 text-center">{{ exam.subject }}</div>
             <div class="col-span-2 text-center">{{ exam.code }}</div>
@@ -65,7 +65,7 @@
             <PaginationList v-slot="{ items }" class="flex items-center gap-1">
               <PaginationFirst />
               <PaginationPrev />
-              <template v-for="(item, index) in items">
+              <template v-for="(item, index) in items" :key="index">
                 <PaginationListItem v-if="item.type === 'page'" :key="index" :value="item.value" as-child>
                   <Button class="w-10 h-10 p-0" :variant="item.value === page ? 'default' : 'outline'">
                     {{ item.value }}

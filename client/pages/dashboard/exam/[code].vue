@@ -11,12 +11,12 @@
       </div>
 
       <div class="w-full mt-5 h-[calc(100%-48px)] space-y-5 overflow-y-scroll no-scrollbar">
-        <div v-for="question, index in exam?.questions" class="bg-white shadow-md border rounded-md p-3">
+        <div v-for="question, index in exam?.questions" :key="index" class="bg-white shadow-md border rounded-md p-3">
           <div class="w-full rounded-md">
             <span class="font-bold">問題 {{ index + 1 }}:</span> {{ question.content }}
           </div>
 
-          <div v-for="answer, index in question.answers" class="py-2" :class="answer.is_correct && 'text-green-500 font-semibold'">
+          <div v-for="answer, index in question.answers" :key="index" class="py-2" :class="answer.is_correct && 'text-green-500 font-semibold'">
             <span>{{ String.fromCharCode(index + 65) }}.</span>  {{ answer.content }}
           </div>
         </div>

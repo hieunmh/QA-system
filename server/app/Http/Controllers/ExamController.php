@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateExamRequest;
 use App\Http\Requests\GetExamRequest;
+use App\Http\Resources\ExamResource;
 use App\Models\Exam;
 use App\Service\AnswerService;
 use App\Service\QuestionService;
@@ -61,6 +62,12 @@ class ExamController extends Controller
             'code' => $code,
         ])->first();
 
-        return $exam;
+        $exam->questions = $this->questionService->shuffleQuestion($exam->questions);
+
+        for ($i = 0 ; $i < count($exam->questions); $i++) {
+            $exam->questions[$i]->answers = $this->answerService->shuffleAnswer($exam->questions[$i]->answers);
+        }
+
+        return new ExamResource($exam);
     }
 }
