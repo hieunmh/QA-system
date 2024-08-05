@@ -13,7 +13,7 @@ import { Toaster } from 'vue-sonner';
 const token = useCookie('XSRF-TOKEN');
 const userStore = useUserStore();
 
-onMounted(async () => {
+onBeforeMount(async () => {
   if (token.value) {
     await axiosClient.get('/api/user').then(res => {
       userStore.user = res.data;

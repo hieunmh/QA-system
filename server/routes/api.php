@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ExamController;
+use App\Http\Controllers\ResultController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -25,4 +26,8 @@ Route::middleware(['auth:sanctum'])->group(function() {
     Route::get('/exam/{code}', [ExamController::class, 'getExam']);
 
     Route::get('/exams', [ExamController::class, 'getExams']);
+
+    Route::post('/result',[ResultController::class, 'createResult']);
+
+    Route::get('/result/{user_id}/{exam_id}', [ResultController::class, 'getResult']);
 });

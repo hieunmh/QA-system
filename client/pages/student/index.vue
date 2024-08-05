@@ -65,11 +65,13 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '~/components/ui/button';
 import axiosClient from '~/lib/axios';
 import { toast } from 'vue-sonner';
+import moment from 'moment';
 
 const userStore = useUserStore();
 const examStore = useExamStore();
 const value = ref<string[]>([]);
 const router = useRouter();
+const ex = useCookie('ex');
 
 let isLoading = ref(false);
 let codeError = ref('');
@@ -82,8 +84,17 @@ watch(() => value.value, () => {
   }
 });
 
-const takeExam = () => {
+const takeExam = async () => {
   router.push('/student/exam');
+
+  await axiosClient.post('/api/result', {
+    user_id: userStore.user?.id,
+    exam_id: examStore.id,
+    start_time: Date.now().toString(),
+    end_time: (Date.now() + examStore.time * 1000).toString(),
+    review: examStore.review,
+    redo: examStore.redo
+  })
 }
 
 const joinExam = async () => {
@@ -104,7 +115,10 @@ const joinExam = async () => {
     return;
   }
 
+  ex.value = res.code;
+
   isOpenDialog.value = true;
+  examStore.id = res.id;
   examStore.code = res.code;
   examStore.subject = res.subject;
   examStore.time = res.time;

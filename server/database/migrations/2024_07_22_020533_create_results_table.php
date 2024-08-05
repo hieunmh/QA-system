@@ -17,8 +17,8 @@ return new class extends Migration
             $table->uuid('exam_id')->nullable();
             $table->unique(['user_id', 'exam_id']);
             $table->double('score')->nullable();
-            $table->dateTime('start_time');
-            $table->dateTime('end_time');
+            $table->string('start_time')->nullable();
+            $table->string('end_time')->nullable();
             $table->boolean('review');
             $table->boolean('redo');
             $table->timestamps();

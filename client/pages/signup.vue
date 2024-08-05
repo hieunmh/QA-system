@@ -46,7 +46,7 @@
           </SelectContent>
         </Select>
 
-        <Button @click="signup()" class="bg-common w-full hover:bg-common/90 py-6 mt-5">
+        <Button @click.prevent="signup()" class="bg-common w-full hover:bg-common/90 py-6 mt-5">
           <Icon v-if="isLoading"name="icon-park-outline:loading-four" size="24" class="animate-spin"/>
           <p v-else>登録</p>
         </Button>

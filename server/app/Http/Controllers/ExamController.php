@@ -57,6 +57,7 @@ class ExamController extends Controller
     }
 
     public function getExam($code) {    
+        
 
         $exam = Exam::with(['questions', 'questions.answers'])->where([
             'code' => $code,

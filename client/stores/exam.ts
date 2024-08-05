@@ -4,9 +4,10 @@ import type { QuestionType } from "~/types/type";
 
 export const useExamStore = defineStore('exam', {
   state: () => ({
+    id: '',
     code: '',
     subject: '',
-    time: 10,
+    time: 0,
     review: 'true',
     redo: 'true',
     questions: [] as QuestionType[]

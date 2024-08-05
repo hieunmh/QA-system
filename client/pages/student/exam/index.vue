@@ -56,24 +56,46 @@ import { useUserStore } from '~/stores/user';
 import { useExamStore } from '~/stores/exam';
 import { Skeleton } from '~/components/ui/skeleton';
 import { Checkbox } from '~/components/ui/checkbox';
+import axiosClient from '~/lib/axios';
 
 const userStore = useUserStore();
 const examStore = useExamStore();
+const ex = useCookie('ex');
 
 let time = ref(examStore.time * 60);
-let min = ref(examStore.time.toString());
+let min = ref(examStore.time <= 10 ? '0' + examStore.time : examStore.time.toString());
 let sec = ref('00');
 
 let width = ref(100);
 
+onMounted(async () => {
 
-onMounted(() => {
+})
+
+
+onMounted(async () => {
+
+  const res = (await axiosClient.get(`/api/exam/${ex.value}`)).data.data;
+  examStore.id = res.id;
+  examStore.code = res.code;
+  examStore.subject = res.subject;
+  examStore.time = res.time;
+  examStore.questions = res.questions;
+  examStore.redo = res.redo;
+  examStore.review = res.review;
+  
+  time.value = res.time * 60;
+  
   setInterval(() => {
+    if (time.value === 0) return;
     time.value--;
     width.value = time.value /(examStore.time * 60) * 100
     min.value = Math.fround(time.value / 60) >= 10 ?  Math.floor(time.value / 60).toString() : '0' + Math.floor(time.value / 60);
     sec.value = time.value % 60 >= 10 ? (time.value % 60).toString() : '0' + (time.value % 60);
-  }, 1000)
+  }, 1000);
+
+  const a = await axiosClient.get(`/api/result/${userStore.user?.id}/${examStore.id}`);
+  console.log(a.data);
 })
 
 </script>
