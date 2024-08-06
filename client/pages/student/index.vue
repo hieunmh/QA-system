@@ -91,7 +91,7 @@ const takeExam = async () => {
     user_id: userStore.user?.id,
     exam_id: examStore.id,
     start_time: Date.now().toString(),
-    end_time: (Date.now() + examStore.time * 1000).toString(),
+    end_time: (Date.now() + examStore.time * 60 * 1000).toString(),
     review: examStore.review,
     redo: examStore.redo
   })

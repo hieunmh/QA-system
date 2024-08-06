@@ -20,8 +20,12 @@
       </div>
     </div>
 
-    <div class="w-full h-full bg-[#fafafc] lg:px-20 px-2 flex space-x-5 py-5">
-      <div class="w-[300px] h-full flex flex-col font-medium">
+    <div class="w-full h-[calc(100%-80px)] bg-[#fafafc] lg:px-20 px-2 flex space-x-5 py-5">
+      <div v-if="min == '00'" class="w-[300px] h-full flex flex-col font-medium">
+        <Skeleton class="h-24" />
+      </div>
+
+      <div v-else class="w-[300px] h-full flex flex-col font-medium">
         <p>コード: {{ examStore.code }}</p>
         <p>主題: {{ examStore.subject }}</p>
         <p>時間: {{ examStore.time }} 分</p>
@@ -32,31 +36,43 @@
         </div>
       </div>
 
-      <div class="w-full space-y-5">
-        <div v-for="question, index in examStore.questions" :key="index" class="bg-white rounded-md shadow-md w-full p-4 space-y-3">
-          <span class="font-semibold">問題 {{ index + 1 }}</span>: {{ question.content }}
-          <div v-for="answer, id in question.answers" :key="id" class=" space-x-2 flex items-center">
-            <Checkbox />
-            <span>{{  String.fromCharCode(id + 65) }}</span>. {{ answer.content }}
+      <div class="w-full h-[calc(100%-50px)]">
+        <ScrollArea class="w-full h-full overflow-y-scroll px-4">
+          <div v-for="question, index in examStore.questions" :key="index" :id="(index + 1).toString()" class="bg-white rounded-md shadow-md w-full p-4 space-y-3 mb-5">
+            <span class="font-semibold">問題 {{ index + 1 }}</span>: {{ question.content }}
+            <div v-for="answer, id in question.answers" :key="id" class=" space-x-2 flex items-center">
+              <input @click="selectAnswer((index + 1).toString(), answer.id || '')" :id="answer.id" type="checkbox" class="h-4 w-4 rounded-full bg-red-300">
+              <span>{{  String.fromCharCode(id + 65) }}</span>. {{ answer.content }}
+            </div>
           </div>
+        </ScrollArea>
+
+        <div class="w-full flex items-center justify-center">
+          
+          <Button @click="submitExam()" class="w-[200px] bg-common border-[1.5px] border-common hover:bg-white hover:text-common flex items-center justify-center">
+            <Icon v-if="isLoading"name="icon-park-outline:loading-four" size="20" class="animate-spin"/>
+            <p v-else>提出</p>
+          </Button>
         </div>
       </div>
 
-      <div class="w-[300px] h-full bg-red-100">
-
+      <div class="w-[300px] h-full grid grid-cols-3 gap-3">
+        <a :href="'#' + (index + 1).toString()" v-for="item, index in examStore.questions" :key="index" :id="'tag' + (index + 1).toString()"
+          class="w-full aspect-square flex items-center justify-center text-center border-[1.5px] rounded-lg font-semibold"
+        >
+          {{ index + 1 }}
+        </a>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-// definePageMeta({ middleware: 'has-exam' });
-
 import { useUserStore } from '~/stores/user';
 import { useExamStore } from '~/stores/exam';
 import { Skeleton } from '~/components/ui/skeleton';
-import { Checkbox } from '~/components/ui/checkbox';
 import axiosClient from '~/lib/axios';
+import { toast } from 'vue-sonner';
 
 const userStore = useUserStore();
 const examStore = useExamStore();
@@ -67,11 +83,8 @@ let min = ref(examStore.time <= 10 ? '0' + examStore.time : examStore.time.toStr
 let sec = ref('00');
 
 let width = ref(100);
-
-onMounted(async () => {
-
-})
-
+let isLoading = ref(false);
+let answerIds = ref<string[]>([]);
 
 onMounted(async () => {
 
@@ -83,19 +96,61 @@ onMounted(async () => {
   examStore.questions = res.questions;
   examStore.redo = res.redo;
   examStore.review = res.review;
-  
-  time.value = res.time * 60;
+
+  const a = await axiosClient.get(`/api/result/${userStore.user?.id}/${examStore.id}`);  
   
   setInterval(() => {
+    time.value = Math.floor((parseInt(a.data.end_time) - Date.now()) / 1000)
+
     if (time.value === 0) return;
     time.value--;
     width.value = time.value /(examStore.time * 60) * 100
     min.value = Math.fround(time.value / 60) >= 10 ?  Math.floor(time.value / 60).toString() : '0' + Math.floor(time.value / 60);
     sec.value = time.value % 60 >= 10 ? (time.value % 60).toString() : '0' + (time.value % 60);
   }, 1000);
+});
 
-  const a = await axiosClient.get(`/api/result/${userStore.user?.id}/${examStore.id}`);
-  console.log(a.data);
-})
+const selectAnswer = (id: string, answerId: string) => {
+  let tag = document.getElementById(`tag${id}`);  
+
+  let question = document.getElementById(id);
+  let checkbox = question?.querySelectorAll('input');
+
+  checkbox?.forEach(c => {  
+    if (c.id !== answerId) {
+      c.checked = false;
+    }
+  });
+
+  let checked = question?.querySelectorAll('input:checked');
+
+  if (checked?.length && checked.length > 0) tag?.classList.add('bg-common', 'text-white')
+  else tag?.classList.remove('bg-common', 'text-white')
+}
+
+const submitExam = async () => {
+  const answers = document.querySelectorAll('input:checked');
+  answerIds.value = [];
+  answers.forEach(a => answerIds.value.push(a.id));
+
+  if (answerIds.value.length < examStore.questions.length) {
+    toast.error('質問の完全な回答を記入してください。');
+    return;
+  }
+
+  isLoading.value = true;
+  await axiosClient.patch('/api/result', {
+    user_id: userStore.user?.id,
+    exam_id: examStore.id,
+    answers: answerIds.value
+  }).then((res) => {
+
+  }).catch(err => {
+
+
+  }).finally(() => {
+    isLoading.value = false;
+  })
+}
 
 </script>

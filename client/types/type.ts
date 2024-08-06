@@ -12,6 +12,7 @@ export type QuestionType = {
 }
 
 export type AnswerType = {
+  id?: string;
   content: string;
   is_correct: boolean;
 }

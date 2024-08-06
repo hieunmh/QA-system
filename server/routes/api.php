@@ -29,5 +29,7 @@ Route::middleware(['auth:sanctum'])->group(function() {
 
     Route::post('/result',[ResultController::class, 'createResult']);
 
+    Route::patch('/result', [ResultController::class, 'updateResult']);
+
     Route::get('/result/{user_id}/{exam_id}', [ResultController::class, 'getResult']);
 });

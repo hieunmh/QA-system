@@ -25,4 +25,8 @@ class AnswerService
   public function shuffleAnswer($answers) {
     return $answers->shuffle();
   }
+
+  public function getCorrectAnswer($answers) {
+    
+  }
 }
