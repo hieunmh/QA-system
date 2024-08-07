@@ -9,7 +9,6 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
 
 class ResultController extends Controller
 {   
@@ -41,15 +40,36 @@ class ResultController extends Controller
     public function updateResult(Request $request) {
         try {  
             $answers = $request->answers;
+            $quantity = $request->quantity;
 
-            $score = $this->resultService->getCorrectAnswer($answers);
+            if (count($answers) == 0) {
+                Result::where([
+                    'user_id' => $request->user_id,
+                    'exam_id' => $request->exam_id
+                ])->update([
+                    'score' => 0
+                ]);
+                
+            } else {
+                $score = $this->resultService->getCorrectAnswer($answers);
 
-            Result::where([
+                Result::where([
+                    'user_id' => $request->user_id,
+                    'exam_id' => $request->exam_id
+                ])->update([
+                    'score' => ($score / $quantity) * 10
+                ]);
+            }
+
+            $result = Result::where([
                 'user_id' => $request->user_id,
                 'exam_id' => $request->exam_id
-            ])->update([
-                'score' => ($score / count($answers)) * 10
-            ]);
+            ])->first();
+
+            return response()->json([
+                'status' => Response::HTTP_OK,
+                'data' => $result->review ? $result->score : ''
+            ], Response::HTTP_OK);
 
         } catch (Exception $e) {
             return response()->json([

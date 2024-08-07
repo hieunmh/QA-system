@@ -51,6 +51,28 @@
         </Button>
       </DialogContent>
     </Dialog>
+
+    <Dialog :open="examStore.openResult">
+      <DialogTrigger class="hidden">
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle class="font-semibold text-center">
+            <div v-if="resultStore.status === 200" class="flex justify-center flex-col items-center space-y-3 text-3xl">
+              {{ resultStore.score }} 点
+            </div>
+
+            <div v-else>テストを受けました</div>
+          </DialogTitle>
+        </DialogHeader>
+
+        <Button @click="examStore.openResult = false">
+          閉じる
+        </Button>
+      </DialogContent>
+    </Dialog>
+    
+
   </StudentLayout>
 </template>
 
@@ -65,10 +87,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '~/components/ui/button';
 import axiosClient from '~/lib/axios';
 import { toast } from 'vue-sonner';
-import moment from 'moment';
 
 const userStore = useUserStore();
 const examStore = useExamStore();
+const resultStore = useResultStore();
 const value = ref<string[]>([]);
 const router = useRouter();
 const ex = useCookie('ex');
@@ -107,25 +129,24 @@ const joinExam = async () => {
   let code = '';
   value.value.forEach(c => code += c);
   isLoading.value = true;
-  const res = (await axiosClient.get(`/api/exam/${code}`)).data.data;
-  
-  if (!res) {
+
+  await axiosClient.get(`/api/exam/${code}`).then(res => {    
+    isOpenDialog.value = true;
+    
+    examStore.id = res.data.data.id;
+    examStore.code = res.data.data.code;
+    examStore.subject = res.data.data.subject;
+    examStore.time = res.data.data.time;
+    examStore.questions = res.data.data.questions;
+    examStore.redo = res.data.data.redo;
+    examStore.review = res.data.data.review;
+    ex.value = res.data.data.id;
+
+  }).catch(err => {
     toast.error('テストが見つかりません。');
+  }).finally(() => {
     isLoading.value = false;
-    return;
-  }
-
-  ex.value = res.code;
-
-  isOpenDialog.value = true;
-  examStore.id = res.id;
-  examStore.code = res.code;
-  examStore.subject = res.subject;
-  examStore.time = res.time;
-  examStore.questions = res.questions;
-  examStore.redo = res.redo;
-  examStore.review = res.review;
-  isLoading.value = false;
+  })
 }
 
 </script>

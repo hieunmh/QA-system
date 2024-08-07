@@ -1,8 +1,8 @@
 import { useExamStore } from "~/stores/exam";
 
 export default defineNuxtRouteMiddleware((to, from) => {
-  const examStore = useExamStore();
-  if (!examStore.code) {
+  const ex = useCookie('ex');
+  if (!ex.value) {
     return navigateTo('/student');
   }
 })

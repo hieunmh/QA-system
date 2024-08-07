@@ -8,6 +8,7 @@ use App\Http\Resources\ExamResource;
 use App\Models\Exam;
 use App\Service\AnswerService;
 use App\Service\QuestionService;
+use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -59,16 +60,23 @@ class ExamController extends Controller
     public function getExam($code) {    
         
 
-        $exam = Exam::with(['questions', 'questions.answers'])->where([
-            'code' => $code,
-        ])->first();
-
-        $exam->questions = $this->questionService->shuffleQuestion($exam->questions);
-
-        for ($i = 0 ; $i < count($exam->questions); $i++) {
-            $exam->questions[$i]->answers = $this->answerService->shuffleAnswer($exam->questions[$i]->answers);
+        try {
+            $exam = Exam::with(['questions', 'questions.answers'])->where([
+                'code' => $code,
+            ])->first();
+    
+            $exam->questions = $this->questionService->shuffleQuestion($exam->questions);
+    
+            for ($i = 0 ; $i < count($exam->questions); $i++) {
+                $exam->questions[$i]->answers = $this->answerService->shuffleAnswer($exam->questions[$i]->answers);
+            }
+    
+            return new ExamResource($exam);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                'msg' => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR); 
         }
-
-        return new ExamResource($exam);
     }
 }

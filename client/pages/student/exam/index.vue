@@ -21,7 +21,7 @@
     </div>
 
     <div class="w-full h-[calc(100%-80px)] bg-[#fafafc] lg:px-20 px-2 flex space-x-5 py-5">
-      <div v-if="min == '00'" class="w-[300px] h-full flex flex-col font-medium">
+      <div v-if="min == '00' && sec == '00'" class="w-[300px] h-full flex flex-col font-medium">
         <Skeleton class="h-24" />
       </div>
 
@@ -68,6 +68,7 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({ middleware: ['has-exam'] });
 import { useUserStore } from '~/stores/user';
 import { useExamStore } from '~/stores/exam';
 import { Skeleton } from '~/components/ui/skeleton';
@@ -76,7 +77,9 @@ import { toast } from 'vue-sonner';
 
 const userStore = useUserStore();
 const examStore = useExamStore();
+const resultStore = useResultStore();
 const ex = useCookie('ex');
+const router = useRouter();
 
 let time = ref(examStore.time * 60);
 let min = ref(examStore.time <= 10 ? '0' + examStore.time : examStore.time.toString());
@@ -88,21 +91,26 @@ let answerIds = ref<string[]>([]);
 
 onMounted(async () => {
 
-  const res = (await axiosClient.get(`/api/exam/${ex.value}`)).data.data;
-  examStore.id = res.id;
-  examStore.code = res.code;
-  examStore.subject = res.subject;
-  examStore.time = res.time;
-  examStore.questions = res.questions;
-  examStore.redo = res.redo;
-  examStore.review = res.review;
+  if (!examStore.id) {
+    const res = (await axiosClient.get(`/api/exam/${ex.value}`)).data.data;
+    examStore.id = res.id;
+    examStore.code = res.code;
+    examStore.subject = res.subject;
+    examStore.time = res.time;
+    examStore.questions = res.questions;
+    examStore.redo = res.redo;
+    examStore.review = res.review;
+  };
 
   const a = await axiosClient.get(`/api/result/${userStore.user?.id}/${examStore.id}`);  
   
   setInterval(() => {
-    time.value = Math.floor((parseInt(a.data.end_time) - Date.now()) / 1000)
+    time.value = Math.floor((parseInt(a.data.end_time) - Date.now()) / 1000);
 
-    if (time.value === 0) return;
+    if (time.value === 0) {
+      submitExam();
+      return;
+    };
     time.value--;
     width.value = time.value /(examStore.time * 60) * 100
     min.value = Math.fround(time.value / 60) >= 10 ?  Math.floor(time.value / 60).toString() : '0' + Math.floor(time.value / 60);
@@ -129,11 +137,12 @@ const selectAnswer = (id: string, answerId: string) => {
 }
 
 const submitExam = async () => {
+  ex.value = null;
   const answers = document.querySelectorAll('input:checked');
   answerIds.value = [];
   answers.forEach(a => answerIds.value.push(a.id));
 
-  if (answerIds.value.length < examStore.questions.length) {
+  if (time.value !== 0 && answerIds.value.length < examStore.questions.length) {
     toast.error('質問の完全な回答を記入してください。');
     return;
   }
@@ -142,9 +151,17 @@ const submitExam = async () => {
   await axiosClient.patch('/api/result', {
     user_id: userStore.user?.id,
     exam_id: examStore.id,
-    answers: answerIds.value
+    answers: answerIds.value,
+    quantity: examStore.questions.length
   }).then((res) => {
-
+    router.push('/student');
+    examStore.openResult = true;    
+    
+    if (res.status === 200) {
+      resultStore.score = res.data.data;
+      resultStore.status = res.data.status
+    }
+    
   }).catch(err => {
 
 

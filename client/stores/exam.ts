@@ -10,6 +10,7 @@ export const useExamStore = defineStore('exam', {
     time: 0,
     review: 'true',
     redo: 'true',
-    questions: [] as QuestionType[]
+    questions: [] as QuestionType[],
+    openResult: false
   })
 })
