@@ -50,12 +50,14 @@
             <div class="col-span-2 text-center">時間(分)</div>
           </div>
           
-          <NuxtLink :to="`/dashboard/exam/${exam.code}`" v-for="(exam, index) in examsStore.exams" :key="index" class="grid grid-cols-12 font-normal py-5 hover:bg-gray-50 border-t">
+          <NuxtLink :to="`/dashboard/exam/${exam.code}`" v-for="(exam, index) in examsStore.exams" :key="index" 
+            class="grid grid-cols-12 font-normal py-5 hover:bg-gray-50 border-t"
+          >
             <div class="col-span-2 text-center">{{ index + 1 }}</div>
             <div class="col-span-2 text-center">{{ exam.subject }}</div>
             <div class="col-span-2 text-center">{{ exam.code }}</div>
             <div class="col-span-2 text-center">{{  exam.questions.length }}</div>
-            <div class="col-span-2 text-center">123</div>
+            <div class="col-span-2 text-center">{{ exam.results.length }}</div>
             <div class="col-span-2 text-center">{{ exam.time }}</div>
           </NuxtLink> 
         </div>

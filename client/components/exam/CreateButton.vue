@@ -46,7 +46,7 @@
 
           <div class="w-full">
             <span class="font-semibold">時間(分)</span>
-            <NumberField :default-value="examStore.time" :min="0" v-model="examStore.time">
+            <NumberField :default-value="examStore.time" :min="1" v-model="examStore.time">
               <NumberFieldContent>
                 <NumberFieldDecrement />
                 <NumberFieldInput />

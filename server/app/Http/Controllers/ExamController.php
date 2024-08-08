@@ -50,16 +50,14 @@ class ExamController extends Controller
     public function getExams() {
         $user_id = Auth::user()->id;
 
-        $exam = Exam::with(['questions', 'questions.answers'])->where([
+        $exam = Exam::with(['questions', 'questions.answers', 'results', 'results.user'])->where([
             'user_id' => $user_id
         ])->get();
-
+        
         return $exam;
     }
 
     public function getExam($code) {    
-        
-
         try {
             $exam = Exam::with(['questions', 'questions.answers'])->where([
                 'code' => $code,
