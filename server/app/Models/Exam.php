@@ -33,6 +33,10 @@ class Exam extends Model
         return $this->hasMany(Result::class);
     }
 
+    public function histories(): HasMany {
+        return $this->hasMany(History::class);
+    }
+
     protected $casts = [
         'redo' => 'boolean',
         'review' => 'boolean',

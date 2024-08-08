@@ -140,7 +140,7 @@ const joinExam = async () => {
     examStore.questions = res.data.data.questions;
     examStore.redo = res.data.data.redo;
     examStore.review = res.data.data.review;
-    ex.value = res.data.data.id;
+    ex.value = res.data.data.code;
 
   }).catch(err => {
     toast.error('テストが見つかりません。');

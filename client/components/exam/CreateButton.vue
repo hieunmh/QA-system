@@ -115,7 +115,7 @@ const examStore = useExamStore();
 const modalStore = useModalStore();
 
 const autoGenCode = () => {
-  examStore.code = randomstring({ length: 10 })
+  examStore.code = randomstring({ length: 10 }).toLowerCase()
 }
 
 const createExam = () => {

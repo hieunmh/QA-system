@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Answer;
 use App\Models\Result;
+use App\Service\HistoryService;
 use App\Service\ResultService;
-use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -13,9 +12,11 @@ use Illuminate\Http\Response;
 class ResultController extends Controller
 {   
     protected ResultService $resultService;
+    protected HistoryService $historyService;
 
-    public function __construct(ResultService $resultService) {
+    public function __construct(ResultService $resultService, HistoryService $historyService) {
         $this->resultService = $resultService;
+        $this->historyService = $historyService;
     }
 
     public function createResult(Request $request) {
@@ -60,6 +61,8 @@ class ResultController extends Controller
                     'score' => ($score / $quantity) * 10
                 ]);
             }
+
+            $histories = $this->historyService->insert($request->user_id, $request->exam_id, $answers);
 
             $result = Result::where([
                 'user_id' => $request->user_id,

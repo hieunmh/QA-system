@@ -7,6 +7,7 @@ export type UserType = {
 }
 
 export type QuestionType = {
+  id?: string;
   content: string;
   answers: AnswerType[]
 }
@@ -27,6 +28,14 @@ export type ResultType = {
   user: UserType
 }
 
+export type HistoryType = {
+  id: string;
+  user_id: string;
+  exam_id: string;
+  question_id: string;
+  answer_id: string;
+}
+
 export type ExamType = {
   code: string;
   user_id: string;
@@ -37,5 +46,6 @@ export type ExamType = {
   time: number;
   created_at: string;
   subject: string;
-  results: ResultType[]
+  results: ResultType[],
+  histories: HistoryType[]
 }

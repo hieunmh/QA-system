@@ -52,6 +52,10 @@ class User extends Authenticatable
         return $this->hasMany(Exam::class);
     }
 
+    public function history() {
+        return $this->hasMany(History::class);
+    }
+
     public function is_teacher(): bool {
         return $this->role == 'teacher';
     }

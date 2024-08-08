@@ -52,7 +52,7 @@
         </Button>
       </form>
 
-      <div class="h-4 text-center text-xs pt-1 text-rose-500 font-semibold">{{ serverError }}</div>
+      <div class="h-4 text-center text-xs text-rose-500 font-semibold">{{ serverError }}</div>
 
       <Button class="w-full flex items-center justify-center py-6 border bg-white hover:bg-gray-50 space-x-1">
         <img src="/google.png" alt="google" class="w-[24px]">

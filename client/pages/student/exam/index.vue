@@ -38,10 +38,10 @@
 
       <div class="w-full h-[calc(100%-50px)]">
         <ScrollArea class="w-full h-full overflow-y-scroll px-4">
-          <div v-for="question, index in examStore.questions" :key="index" :id="(index + 1).toString()" class="bg-white rounded-md shadow-md w-full p-4 space-y-3 mb-5">
+          <div v-for="question, index in examStore.questions" :key="index" :id="question.id" class="bg-white rounded-md shadow-md w-full p-4 space-y-3 mb-5 questions">
             <span class="font-semibold">問題 {{ index + 1 }}</span>: {{ question.content }}
             <div v-for="answer, id in question.answers" :key="id" class=" space-x-2 flex items-center">
-              <input @click="selectAnswer((index + 1).toString(), answer.id || '')" :id="answer.id" type="checkbox" class="h-4 w-4 rounded-full bg-red-300">
+              <input @click="selectAnswer(question.id || '', answer.id || '')" :id="answer.id" type="checkbox" class="h-4 w-4 rounded-full bg-red-300">
               <span>{{  String.fromCharCode(id + 65) }}</span>. {{ answer.content }}
             </div>
           </div>
@@ -57,7 +57,7 @@
       </div>
 
       <div class="w-[300px] h-full grid grid-cols-3 gap-3">
-        <a :href="'#' + (index + 1).toString()" v-for="item, index in examStore.questions" :key="index" :id="'tag' + (index + 1).toString()"
+        <a :href="'#' + item.id" v-for="item, index in examStore.questions" :key="index" :id="'tag' + item.id"
           class="w-full aspect-square flex items-center justify-center text-center border-[1.5px] rounded-lg font-semibold"
         >
           {{ index + 1 }}
@@ -68,7 +68,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ middleware: ['has-exam'] });
+// definePageMeta({ middleware: ['has-exam'] });
 import { useUserStore } from '~/stores/user';
 import { useExamStore } from '~/stores/exam';
 import { Skeleton } from '~/components/ui/skeleton';
@@ -87,7 +87,7 @@ let sec = ref('00');
 
 let width = ref(100);
 let isLoading = ref(false);
-let answerIds = ref<string[]>([]);
+let answerIds = ref<{ question_id: string, answer_id: string }[]>([]);
 
 onMounted(async () => {
 
@@ -113,7 +113,7 @@ onMounted(async () => {
     };
     time.value--;
     width.value = time.value /(examStore.time * 60) * 100
-    min.value = Math.fround(time.value / 60) >= 10 ?  Math.floor(time.value / 60).toString() : '0' + Math.floor(time.value / 60);
+    min.value = Math.round(time.value / 60) >= 10 ?  Math.floor(time.value / 60).toString() : '0' + Math.floor(time.value / 60);
     sec.value = time.value % 60 >= 10 ? (time.value % 60).toString() : '0' + (time.value % 60);
   }, 1000);
 });
@@ -138,11 +138,19 @@ const selectAnswer = (id: string, answerId: string) => {
 
 const submitExam = async () => {
   ex.value = null;
-  const answers = document.querySelectorAll('input:checked');
   answerIds.value = [];
-  answers.forEach(a => answerIds.value.push(a.id));
+  const questions = document.querySelectorAll('.questions');
+  questions.forEach(q => {
+    const answer = q.querySelector('input:checked');
+    answerIds.value.push({
+      question_id: q.id,
+      answer_id: answer?.id || ''
+    })
+  });
 
-  if (time.value !== 0 && answerIds.value.length < examStore.questions.length) {
+  const selectedAnswer = document.querySelectorAll('input:checked');  
+
+  if (time.value !== 0 && selectedAnswer.length < examStore.questions.length) {
     toast.error('質問の完全な回答を記入してください。');
     return;
   }
@@ -154,6 +162,7 @@ const submitExam = async () => {
     answers: answerIds.value,
     quantity: examStore.questions.length
   }).then((res) => {
+    
     router.push('/student');
     examStore.openResult = true;    
     
